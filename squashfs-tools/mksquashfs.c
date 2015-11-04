@@ -1411,6 +1411,7 @@ again:
 	cache_block_put(compressed_buffer);
 
 finished:
+	do { } while (0);
 	pthread_cleanup_pop(0);
 
 	return buffer;
