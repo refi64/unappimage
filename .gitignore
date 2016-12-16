@@ -1,0 +1,4 @@
+*.o
+*.sw[opq]
+squashfs-tools/mksquashfs
+squashfs-tools/unsquashfs
