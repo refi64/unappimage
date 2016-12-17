@@ -27,6 +27,10 @@
 #define TRUE 1
 #define MAX_LINE 16384
 
+#ifndef COMP_DEFAULT
+#define COMP_DEFAULT "gzip"
+#endif
+
 #include <pwd.h>
 #include <grp.h>
 #include <time.h>
