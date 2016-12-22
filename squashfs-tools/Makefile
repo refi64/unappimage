@@ -145,7 +145,6 @@ ifeq ($(LZMA_XZ_SUPPORT),1)
 CFLAGS += -DLZMA_SUPPORT
 MKSQUASHFS_OBJS += lzma_xz_wrapper.o
 UNSQUASHFS_OBJS += lzma_xz_wrapper.o
-LIBS += -llzma
 COMPRESSORS += lzma
 endif
 
@@ -153,8 +152,16 @@ ifeq ($(XZ_SUPPORT),1)
 CFLAGS += -DXZ_SUPPORT
 MKSQUASHFS_OBJS += xz_wrapper.o
 UNSQUASHFS_OBJS += xz_wrapper.o
-LIBS += -llzma
 COMPRESSORS += xz
+endif
+
+ifneq ($(LZMA_XZ_SUPPORT)$(XZ_SUPPORT),)
+ifneq ($(LZMA_LIB),)
+MKSQUASHFS_OBJS += $(LZMA_LIB)
+UNSQUASHFS_OBJS += $(LZMA_LIB)
+else
+LIBS += -llzma
+endif
 endif
 
 ifeq ($(LZO_SUPPORT),1)
