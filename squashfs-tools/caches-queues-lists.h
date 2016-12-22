@@ -123,6 +123,7 @@ struct file_buffer {
 	char locked;
 	char wait_on_unlock;
 	char noD;
+	long _pad;
 	char data[0];
 };
 
