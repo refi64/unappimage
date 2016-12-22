@@ -35,7 +35,7 @@ int read_fragment_table_4(long long *directory_table_end)
 	size_t indexes = SQUASHFS_FRAGMENT_INDEXES(sBlk.s.fragments);
 	long long *fragment_table_index;
 
-	TRACE("read_fragment_table: %d fragments, reading %d fragment indexes "
+	TRACE("read_fragment_table: %u fragments, reading %zu fragment indexes "
 		"from 0x%llx\n", sBlk.s.fragments, indexes,
 		sBlk.s.fragment_table_start);
 
