@@ -38,6 +38,10 @@
 #include <limits.h>
 #include <ctype.h>
 
+#ifdef linux
+#include <sys/sysmacros.h>
+#endif
+
 struct cache *fragment_cache, *data_cache;
 struct queue *to_reader, *to_inflate, *to_writer, *from_writer;
 pthread_t *thread, *inflator_thread;

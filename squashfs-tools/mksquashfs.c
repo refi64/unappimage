@@ -63,6 +63,7 @@
 #else
 #include <endian.h>
 #include <sys/sysinfo.h>
+#include <sys/sysmacros.h>
 #endif
 
 #include "squashfs_fs.h"
