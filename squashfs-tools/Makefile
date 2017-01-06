@@ -156,6 +156,8 @@ COMPRESSORS += xz
 endif
 
 ifneq ($(LZMA_XZ_SUPPORT)$(XZ_SUPPORT),)
+MKSQUASHFS_OBJS += lzma_xz_options.o
+UNSQUASHFS_OBJS += lzma_xz_options.o
 ifneq ($(LZMA_LIB),)
 MKSQUASHFS_OBJS += $(LZMA_LIB)
 UNSQUASHFS_OBJS += $(LZMA_LIB)
