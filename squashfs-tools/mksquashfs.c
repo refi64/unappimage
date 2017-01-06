@@ -37,6 +37,9 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stddef.h>
+#if defined(__OpenBSD__)
+#include <sys/param.h>
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>

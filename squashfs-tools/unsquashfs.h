@@ -27,6 +27,9 @@
 #define TRUE 1
 #define FALSE 0
 #include <stdio.h>
+#if defined(__OpenBSD__)
+#include <sys/param.h>
+#endif
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdlib.h>
