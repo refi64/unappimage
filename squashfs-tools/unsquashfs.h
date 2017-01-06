@@ -58,6 +58,10 @@
 #include <endian.h>
 #endif
 
+#ifndef FNM_EXTMATCH
+#define FNM_EXTMATCH 0
+#endif
+
 #include "squashfs_fs.h"
 #include "error.h"
 
