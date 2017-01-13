@@ -270,10 +270,10 @@ unsigned int sid_count = 0, suid_count = 0, sguid_count = 0;
 struct cache *reader_buffer, *fragment_buffer, *reserve_cache;
 struct cache *bwriter_buffer, *fwriter_buffer;
 struct queue *to_reader, *to_deflate, *to_writer, *from_writer,
-	*to_frag, *locked_fragment, *to_process_frag;
+	*locked_fragment, *to_process_frag;
 struct seq_queue *to_main;
 pthread_t reader_thread, writer_thread, main_thread;
-pthread_t *deflator_thread, *frag_deflator_thread, *frag_thread;
+pthread_t *deflator_thread, *frag_thread;
 pthread_t *restore_thread = NULL;
 pthread_mutex_t	fragment_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t	pos_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -323,7 +323,7 @@ struct dir_info *scan1_opendir(char *pathname, char *subpath, int depth);
 void write_filesystem_tables(struct squashfs_super_block *sBlk, int nopad);
 unsigned short get_checksum_mem(char *buff, int bytes);
 void check_usable_phys_mem(int total_mem);
-
+void frag_deflator(struct file_buffer *file_buffer);
 
 void prep_exit()
 {
@@ -1540,7 +1540,7 @@ void write_fragment(struct file_buffer *fragment)
 	pthread_mutex_lock(&fragment_mutex);
 	fragment_table[fragment->block].unused = 0;
 	fragments_outstanding ++;
-	queue_put(to_frag, fragment);
+	frag_deflator(fragment);
 	pthread_cleanup_pop(1);
 }
 
@@ -2412,50 +2412,33 @@ void *deflator(void *arg)
 }
 
 
-void *frag_deflator(void *arg)
+void frag_deflator(struct file_buffer *file_buffer)
 {
-	void *stream = NULL;
-	int res;
 
-	res = compressor_init(comp, &stream, block_size, 1);
-	if(res)
-		BAD_ERROR("frag_deflator:: compressor_init failed\n");
-
-	pthread_cleanup_push((void *) pthread_mutex_unlock, &fragment_mutex);
-
-	while(1) {
-		int c_byte, compressed_size;
-		struct file_buffer *file_buffer = queue_get(to_frag);
-		struct file_buffer *write_buffer =
+	int c_byte, compressed_size;
+	struct file_buffer *write_buffer =
 			cache_get(fwriter_buffer, file_buffer->block);
 
-		c_byte = mangle2(stream, write_buffer->data, file_buffer->data,
-			file_buffer->size, block_size, noF, 1);
-		compressed_size = SQUASHFS_COMPRESSED_SIZE_BLOCK(c_byte);
-		write_buffer->size = compressed_size;
-		pthread_mutex_lock(&fragment_mutex);
-		if(fragments_locked == FALSE) {
-			fragment_table[file_buffer->block].size = c_byte;
-			fragment_table[file_buffer->block].start_block = bytes;
-			write_buffer->block = bytes;
-			bytes += compressed_size;
-			fragments_outstanding --;
-			queue_put(to_writer, write_buffer);
-			pthread_mutex_unlock(&fragment_mutex);
-			TRACE("Writing fragment %lld, uncompressed size %d, "
-				"compressed size %d\n", file_buffer->block,
-				file_buffer->size, compressed_size);
-		} else {
-				add_pending_fragment(write_buffer, c_byte,
-					file_buffer->block);
-				pthread_mutex_unlock(&fragment_mutex);
-		}
-		cache_block_put(file_buffer);
+	c_byte = mangle2(stream, write_buffer->data, file_buffer->data,
+			 file_buffer->size, block_size, noF, 1);
+	compressed_size = SQUASHFS_COMPRESSED_SIZE_BLOCK(c_byte);
+	write_buffer->size = compressed_size;
+	if(fragments_locked == FALSE) {
+		fragment_table[file_buffer->block].size = c_byte;
+		fragment_table[file_buffer->block].start_block = bytes;
+		write_buffer->block = bytes;
+		bytes += compressed_size;
+		fragments_outstanding --;
+		queue_put(to_writer, write_buffer);
+		TRACE("Writing fragment %lld, uncompressed size %d, "
+		      "compressed size %d\n", file_buffer->block,
+		      file_buffer->size, compressed_size);
+	} else {
+		add_pending_fragment(write_buffer, c_byte,
+				     file_buffer->block);
 	}
-
-	pthread_cleanup_pop(0);
+	cache_block_put(file_buffer);
 }
-
 
 struct file_buffer *get_file_buffer()
 {
@@ -4257,19 +4240,17 @@ void initialise_threads(int readq, int fragq, int bwriteq, int fwriteq,
 			multiply_overflow(processors * 3, sizeof(pthread_t)))
 		BAD_ERROR("Processors too large\n");
 
-	deflator_thread = malloc(processors * 3 * sizeof(pthread_t));
+	deflator_thread = malloc(processors * 2 * sizeof(pthread_t));
 	if(deflator_thread == NULL)
 		MEM_ERROR();
 
-	frag_deflator_thread = &deflator_thread[processors];
-	frag_thread = &frag_deflator_thread[processors];
+	frag_thread = &deflator_thread[processors];
 
 	to_reader = queue_init(1);
 	to_deflate = queue_init(reader_size);
 	to_process_frag = queue_init(reader_size);
 	to_writer = queue_init(bwriter_size + fwriter_size);
 	from_writer = queue_init(1);
-	to_frag = queue_init(fragment_size);
 	locked_fragment = queue_init(fragment_size);
 	to_main = seq_queue_init();
 	reader_buffer = cache_init(block_size, reader_size, 0, 0);
@@ -4284,9 +4265,6 @@ void initialise_threads(int readq, int fragq, int bwriteq, int fwriteq,
 
 	for(i = 0; i < processors; i++) {
 		if(pthread_create(&deflator_thread[i], NULL, deflator, NULL))
-			BAD_ERROR("Failed to create thread\n");
-		if(pthread_create(&frag_deflator_thread[i], NULL, frag_deflator,
-				NULL) != 0)
 			BAD_ERROR("Failed to create thread\n");
 		if(pthread_create(&frag_thread[i], NULL, frag_thrd,
 				(void *) destination_file) != 0)

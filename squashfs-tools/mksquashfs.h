@@ -135,7 +135,7 @@ struct append_file {
 extern struct cache *reader_buffer, *fragment_buffer, *reserve_cache;
 struct cache *bwriter_buffer, *fwriter_buffer;
 extern struct queue *to_reader, *to_deflate, *to_writer, *from_writer,
-	*to_frag, *locked_fragment, *to_process_frag;
+	*locked_fragment, *to_process_frag;
 extern struct append_file **file_mapping;
 extern struct seq_queue *to_main;
 extern pthread_mutex_t fragment_mutex, dup_mutex;

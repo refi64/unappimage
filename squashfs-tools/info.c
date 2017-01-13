@@ -96,11 +96,6 @@ void dump_state()
 	printf("compressed block queue (deflate thread(s) -> main thread)\n");
 	dump_seq_queue(to_main, 0);
 
-	printf("uncompressed packed fragment queue (main thread -> fragment"
-						" deflate thread(s))\n");
-	dump_queue(to_frag);
-
-
 	printf("locked frag queue (compressed frags waiting while multi-block"
 						" file is written)\n");
 	dump_queue(locked_fragment);
