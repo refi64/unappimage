@@ -312,3 +312,32 @@ install: mksquashfs unsquashfs
 	mkdir -p $(INSTALL_DIR)
 	cp mksquashfs $(INSTALL_DIR)
 	cp unsquashfs $(INSTALL_DIR)
+
+.PHONY: checkastyle
+checkastyle:
+	@command -v astyle >/dev/null 2>&1 || \
+		{ echo >&2 "We need 'astyle' but it's not installed. Aborting."; exit 1; }
+
+.PHONY: checkstyle
+checkstyle: checkastyle
+	@if astyle \
+		--dry-run \
+		--lineend=linux \
+		--suffix=none \
+		--style=kr \
+		--indent=force-tab \
+		--formatted --recursive "./*.c" "./*.h" | grep -q -i formatted ; then \
+		echo Please fix formatting or run fixstyle ; false ; else \
+		echo Style looks ok. ; fi
+
+.PHONY: fixstyle
+fixstyle: checkastyle
+	@echo "\033[1;34mChecking style ...\033[00m"
+	@if astyle \
+		--lineend=linux \
+		--suffix=none \
+		--style=kr \
+		--indent=force-tab \
+		--formatted --recursive "./*.c" "./*.h" | grep -q -i formatted ; then \
+		echo "\033[1;33mPrevious files have been corrected\033[00m" ; else \
+		echo "\033[0;32mAll files are ok\033[00m" ; fi
