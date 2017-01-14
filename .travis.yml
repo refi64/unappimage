@@ -1,0 +1,13 @@
+language: c
+sudo: false
+
+script:
+ - cd squashfs-tools/ ; make checkstyle
+ - cd squashfs-tools/ ; make LZMA_XZ_SUPPORT=1 XZ_SUPPORT=1 XATTR_SUPPORT=
+
+addons:
+  apt:
+    packages:
+      - astyle
+      - liblzma5
+      - liblzma-dev
