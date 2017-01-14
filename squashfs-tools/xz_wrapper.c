@@ -192,7 +192,7 @@ void xz_display_options(void *buffer, int size)
 	if(size != sizeof(struct comp_opts))
 		goto failed;
 
-	SQUASHFS_INSWAP_COMP_OPTS(comp_opts);
+	SQUASHFS_INSWAP_LZMA_COMP_OPTS(comp_opts);
 
 	dictionary_size = comp_opts->dictionary_size;
 	flags = comp_opts->flags;
