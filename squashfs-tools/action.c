@@ -2251,7 +2251,7 @@ TEST_FN(pathname, ACTION_ALL_LNK, \
 	return fnmatch(atom->argv[0], action_data->subpath,
 		       FNM_PATHNAME|FNM_PERIOD|FNM_EXTMATCH) == 0;)
 
-
+/* count the components of the path. E.g. /foo/bar/foobar would return 3 */
 static int count_components(char *path)
 {
 	int count;
@@ -2267,7 +2267,7 @@ static int count_components(char *path)
 	return count;
 }
 
-
+/* return the start of the n component. E.g. /foo/bar/foobar */
 static char *get_start(char *s, int n)
 {
 	int count;
@@ -2287,12 +2287,17 @@ static char *get_start(char *s, int n)
 	return s;
 }
 
-
 static int subpathname_fn(struct atom *atom, struct action_data *action_data)
 {
-	return fnmatch(atom->argv[0], get_start(strdupa(action_data->subpath),
-						count_components(atom->argv[0])),
-		       FNM_PATHNAME|FNM_PERIOD|FNM_EXTMATCH) == 0;
+	int ret;
+	char *path = strdup(action_data->subpath);
+
+	if (!path)
+		return -ENOMEM;
+	ret = fnmatch(atom->argv[0], get_start(path, count_components(atom->argv[0])),
+		      FNM_PATHNAME|FNM_PERIOD|FNM_EXTMATCH) == 0;
+	free(path);
+	return ret;
 }
 
 /*
