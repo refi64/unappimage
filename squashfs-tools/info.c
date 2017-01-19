@@ -35,7 +35,6 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <string.h>
 
 #include "squashfs_fs.h"
 #include "mksquashfs.h"
@@ -129,42 +128,18 @@ void dump_state()
 void *info_thrd(void *arg)
 {
 	sigset_t sigmask;
-	struct timespec timespec = { .tv_sec = 1, .tv_nsec = 0 };
-	int sig, waiting = 0;
+	int sig;
 
 	sigemptyset(&sigmask);
 	sigaddset(&sigmask, SIGQUIT);
 	sigaddset(&sigmask, SIGHUP);
 
 	while(1) {
-		if(waiting)
-			sig = sigtimedwait(&sigmask, NULL, &timespec);
-		else
-			sig = sigwaitinfo(&sigmask, NULL);
+		sigwait(&sigmask, &sig);
 
-		if(sig == -1) {
-			switch(errno) {
-			case EAGAIN:
-				/* interval timed out */
-				waiting = 0;
-			/* FALLTHROUGH */
-			case EINTR:
-				/* if waiting, the wait will be longer, but
-				   that's OK */
-				continue;
-			default:
-				BAD_ERROR("sigtimedwait/sigwaitinfo failed "
-					  "because %s\n", strerror(errno));
-			}
-		}
-
-		if(sig == SIGQUIT && !waiting) {
+		if(sig == SIGQUIT)
 			print_filename();
-
-			/* set one second interval period, if ^\ received
-			   within then, dump queue and cache status */
-			waiting = 1;
-		} else
+		else
 			dump_state();
 	}
 }
