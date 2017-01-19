@@ -29,7 +29,7 @@
 
 #include "lzma_xz_options.h"
 
-static const char const *lzmaver_str[] = { "", "lzma", "xz" };
+static const char * const lzmaver_str[] = { "", "lzma", "xz" };
 
 static struct lzma_xz_options options = {
 	.flags		= 0,
