@@ -137,9 +137,6 @@ unsigned int cache_bytes = 0, cache_size = 0, inode_count = 0;
 /* inode lookup table */
 squashfs_inode *inode_lookup_table = NULL;
 
-/* override all timestamps */
-time_t content_fixed_time = -1;
-
 /* override filesystem creation time */
 time_t mkfs_fixed_time = -1;
 
@@ -2249,8 +2246,6 @@ restat:
 		      pathname_reader(dir_ent), strerror(errno));
 		goto read_err;
 	}
-	if (content_fixed_time != -1)
-		buf2.st_mtime = content_fixed_time;
 
 	if(read_size != buf2.st_size) {
 		close(file);
@@ -3106,7 +3101,7 @@ void dir_scan(squashfs_inode *inode, char *pathname,
 		buf.st_mode = S_IRWXU | S_IRWXG | S_IRWXO | S_IFDIR;
 		buf.st_uid = getuid();
 		buf.st_gid = getgid();
-		buf.st_mtime = content_fixed_time != -1 ? content_fixed_time : time(NULL);
+		buf.st_mtime = time(NULL);
 		buf.st_dev = 0;
 		buf.st_ino = 0;
 		dir_ent->inode = lookup_inode2(&buf, PSEUDO_FILE_OTHER, 0);
@@ -3115,8 +3110,6 @@ void dir_scan(squashfs_inode *inode, char *pathname,
 			/* source directory has disappeared? */
 			BAD_ERROR("Cannot stat source directory %s because %s\n",
 				  pathname, strerror(errno));
-		if(content_fixed_time != -1)
-			buf.st_mtime = content_fixed_time;
 		dir_ent->inode = lookup_inode(&buf);
 	}
 
@@ -3372,8 +3365,6 @@ struct dir_info *dir_scan1(char *filename, char *subpath,
 			free_dir_entry(dir_ent);
 			continue;
 		}
-		if(content_fixed_time != -1)
-			buf.st_mtime = content_fixed_time;
 
 		if((buf.st_mode & S_IFMT) != S_IFREG &&
 				(buf.st_mode & S_IFMT) != S_IFDIR &&
@@ -3553,7 +3544,7 @@ void dir_scan2(struct dir_info *dir, struct pseudo *pseudo)
 		buf.st_gid = pseudo_ent->dev->gid;
 		buf.st_rdev = makedev(pseudo_ent->dev->major,
 				      pseudo_ent->dev->minor);
-		buf.st_mtime = content_fixed_time != -1 ? content_fixed_time : time(NULL);
+		buf.st_mtime = time(NULL);
 		buf.st_ino = pseudo_ino ++;
 
 		if(pseudo_ent->dev->type == 'd') {
@@ -5336,15 +5327,7 @@ print_compressor_options:
 			force_progress = TRUE;
 		else if(strcmp(argv[i], "-no-exports") == 0)
 			exportable = FALSE;
-		else if(strcmp(argv[i], "-content-fixed-time") == 0) {
-			if((++i == argc) || (content_fixed_time =
-						     strtoll(argv[i], &b, 10), *b != '\0')) {
-				ERROR("%s: -content-fixed-time missing or invalid "
-				      "timestamp\n", argv[0]);
-
-				exit(1);
-			}
-		} else if(strcmp(argv[i], "-mkfs-fixed-time") == 0) {
+		else if(strcmp(argv[i], "-mkfs-fixed-time") == 0) {
 			if((++i == argc) || (mkfs_fixed_time =
 						     strtoll(argv[i], &b, 10), *b != '\0')) {
 				ERROR("%s: -mkfs-fixed-time missing or invalid "
@@ -5594,7 +5577,6 @@ printOptions:
 			ERROR("-force-uid uid\t\tset all file uids to uid\n");
 			ERROR("-force-gid gid\t\tset all file gids to gid\n");
 			ERROR("-mkfs-fixed-time time\t\tset mkfs timestamp by epoch\n");
-			ERROR("-content-fixed-time time\t\tset content timestamp by epoch\n");
 			ERROR("-nopad\t\t\tdo not pad filesystem to a multiple "
 			      "of 4K\n");
 			ERROR("-keep-as-directory\tif one source directory is "
