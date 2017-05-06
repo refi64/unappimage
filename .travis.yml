@@ -1,9 +1,18 @@
 language: c
 sudo: false
 
+os:
+  - linux
+  - osx
+
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then brew update ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then  brew install xz ; fi
+
 script:
- - cd squashfs-tools/ ; make checkstyle
- - cd squashfs-tools/ ; make LZMA_XZ_SUPPORT=1 XZ_SUPPORT=1 XATTR_SUPPORT=
+  - cd squashfs-tools/
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]] ; then make checkstyle ; fi
+  - make LZMA_XZ_SUPPORT=1 XZ_SUPPORT=1 XATTR_SUPPORT=
 
 addons:
   apt:
