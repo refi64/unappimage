@@ -4270,8 +4270,9 @@ void initialise_threads(int readq, int fragq, int bwriteq, int fwriteq,
 
 	main_thread = pthread_self();
 
-	quiet || printf("Parallel mksquashfs: Using %d processor%s\n", processors,
-			processors == 1 ? "" : "s");
+	if(!quiet)
+		printf("Parallel mksquashfs: Using %d processor%s\n", processors,
+		       processors == 1 ? "" : "s");
 
 	/* Restore the signal mask for the main thread */
 	if(pthread_sigmask(SIG_SETMASK, &old_mask, NULL) == -1)
@@ -5867,8 +5868,10 @@ printOptions:
 		void *comp_data = compressor_dump_options(comp, block_size,
 				  &size);
 
-		quiet || printf("Creating %d.%d filesystem on %s, block size %d.\n",
-				SQUASHFS_MAJOR, SQUASHFS_MINOR, argv[source + 1], block_size);
+		if(!quiet)
+			printf("Creating %d.%d filesystem on %s, block size %d.\n",
+			       SQUASHFS_MAJOR, SQUASHFS_MINOR,
+			       argv[source + 1], block_size);
 
 		/*
 		 * store any compressor specific options after the superblock,
