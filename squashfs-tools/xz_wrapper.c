@@ -182,7 +182,7 @@ static int xz_extract_options(int block_size, void *buffer, int size)
 }
 
 
-void xz_display_options(void *buffer, int size)
+static void xz_display_options(void *buffer, int size)
 {
 	struct comp_opts *comp_opts = buffer;
 	int dictionary_size, flags, printed;
@@ -375,7 +375,7 @@ static int xz_uncompress(void *dest, void *src, int size, int outsize,
 }
 
 
-void xz_usage()
+static void xz_usage()
 {
 	lzma_xz_usage(LZMA_OPT_XZ);
 	fprintf(stderr, "\t  -Xbcj filter1,filter2,...,filterN\n");
