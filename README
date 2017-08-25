@@ -1,4 +1,4 @@
-squashfs-tools contains tools to interact with the squashfs file system.
+squashfskit is a fork of squashfs-tools.
 
 squashfs is a read-only compressed file system used by Linux based distributions.
 Common use cases are Live CDs and embedded systems.
