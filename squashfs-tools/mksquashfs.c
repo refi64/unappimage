@@ -84,6 +84,7 @@
 #include "read_fs.h"
 #include "restore.h"
 #include "process_fragments.h"
+#include "version.h"
 
 int delete = FALSE;
 int fd;
@@ -5085,7 +5086,7 @@ void calculate_queue_sizes(int mem, int *readq, int *fragq, int *bwriteq,
 
 
 #define VERSION() \
-	printf("mksquashfs version 4.3-git (2014/09/12)\n");\
+	printf("mksquashfs version %s (%s)\n", VERSION_STR, VERSION_DATE_STR);\
 	printf("copyright (C) 2014 Phillip Lougher "\
 		"<phillip@squashfs.org.uk>\n\n"); \
 	printf("This program is free software; you can redistribute it and/or"\

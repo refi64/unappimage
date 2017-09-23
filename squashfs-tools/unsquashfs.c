@@ -41,6 +41,8 @@
 #include <sys/sysmacros.h>
 #endif
 
+#include "version.h"
+
 struct cache *fragment_cache, *data_cache;
 struct queue *to_reader, *to_inflate, *to_writer, *from_writer;
 pthread_t *thread, *inflator_thread;
@@ -2491,7 +2493,7 @@ int parse_number(char *arg, int *res)
 
 
 #define VERSION() \
-	printf("unsquashfs version 4.3 (2014/05/12)\n");\
+	printf("unsquashfs version %s (%s)\n", VERSION_STR, VERSION_DATE_STR);\
 	printf("copyright (C) 2014 Phillip Lougher "\
 		"<phillip@squashfs.org.uk>\n\n");\
     	printf("This program is free software; you can redistribute it and/or"\
