@@ -100,6 +100,7 @@ int noF = FALSE;
 int no_fragments = FALSE;
 int always_use_fragments = FALSE;
 int noI = FALSE;
+int noId = FALSE;
 int noD = FALSE;
 int silent = TRUE;
 int exportable = TRUE;
@@ -678,7 +679,7 @@ long long write_id_table()
 		SQUASHFS_SWAP_INTS(&id_table[i]->id, p + i, 1);
 	}
 
-	return generic_write_table(id_bytes, p, 0, NULL, noI);
+	return generic_write_table(id_bytes, p, 0, NULL, noI || noId);
 }
 
 
@@ -5518,6 +5519,10 @@ print_compressor_options:
 				strcmp(argv[i], "-noInodeCompression") == 0)
 			noI = TRUE;
 
+		else if(strcmp(argv[i], "-noId") == 0 ||
+				strcmp(argv[i], "-noIdTableCompression") == 0)
+			noId = TRUE;
+
 		else if(strcmp(argv[i], "-noD") == 0 ||
 				strcmp(argv[i], "-noDataCompression") == 0)
 			noD = TRUE;
@@ -5588,6 +5593,8 @@ printOptions:
 			ERROR("-xattrs\t\t\tstore extended attributes" XOPT_STR
 			      "\n");
 			ERROR("-noI\t\t\tdo not compress inode table\n");
+			ERROR("-noId\t\t\tdo not compress the uid/gid table"
+			      " (implied by -noI)\n");
 			ERROR("-noD\t\t\tdo not compress data blocks\n");
 			ERROR("-noF\t\t\tdo not compress fragment blocks\n");
 			ERROR("-noX\t\t\tdo not compress extended "
@@ -5672,6 +5679,8 @@ printOptions:
 			      "beginning of the file.\n\t\t\t"
 			      "Default 0 bytes\n");
 			ERROR("-noInodeCompression\talternative name for -noI"
+			      "\n");
+			ERROR("-noIdTableCompression\talternative name for -noId"
 			      "\n");
 			ERROR("-noDataCompression\talternative name for -noD"
 			      "\n");
