@@ -3,7 +3,7 @@
  * filesystem.
  *
  * Copyright (c) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
- * 2012, 2013, 2014
+ * 2012, 2013, 2014, 2017
  * Phillip Lougher <phillip@squashfs.org.uk>
  *
  * This program is free software; you can redistribute it and/or
@@ -1678,6 +1678,11 @@ void squashfs_stat(char *source)
 	       SQUASHFS_UNCOMPRESSED_INODES(sBlk.s.flags) ? "un" : "");
 	printf("Data is %scompressed\n",
 	       SQUASHFS_UNCOMPRESSED_DATA(sBlk.s.flags) ? "un" : "");
+
+	if(sBlk.s.s_major >= 4)
+		printf("Uids/Gids (Id table) are %scompressed\n",
+		       SQUASHFS_UNCOMPRESSED_INODES(sBlk.s.flags) ||
+		       SQUASHFS_UNCOMPRESSED_IDS(sBlk.s.flags) ? "un" : "");
 
 	if(sBlk.s.s_major > 1) {
 		if(SQUASHFS_NO_FRAGMENTS(sBlk.s.flags))
