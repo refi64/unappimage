@@ -1266,10 +1266,6 @@ void write_dir(squashfs_inode *inode, struct dir_info *dir_info,
 		     dir_size + 3, directory_block, directory_offset, NULL, NULL,
 		     dir, 0);
 
-#ifndef FNM_EXTMATCH
-#define FNM_EXTMATCH 0
-#endif
-
 #ifdef SQUASHFS_TRACE
 	{
 		unsigned char *dirp;

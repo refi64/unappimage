@@ -44,10 +44,6 @@
 #include "error.h"
 #include "fnmatch_compat.h"
 
-#ifndef FNM_EXTMATCH
-#define FNM_EXTMATCH 0
-#endif
-
 /*
  * code to parse actions
  */
