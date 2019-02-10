@@ -62,5 +62,5 @@ EOF
 }
 
 cd "$TOP"
-try_git || try_version || REV="unkown"
+try_git || try_version || REV="unknown"
 output_version
