@@ -1,0 +1,24 @@
+This file describes patches of the squashfs-tools and this repository.
+The last common commit is 9c1db6d13a51.
+
+c1ccd7a7681b applied
+f66e57a34ea0 applied
+da60d2d528fd applied
+4280e74de140 applied
+b0ca8a5c98ff applied
+b146d9445b28 applied
+f48d989e41b0 applied
+f72f32b0fe79 applied
+5a498ad24dcf applied
+068dd0499d4d applied (even symlinks are not always 0777 (only on linux)
+94f557524a2a applied
+dd0eeb33add2 applied
+9df267a37314 applied
+4b963869c851 applied
+7a1d01138c49 applied
+5be5d61e5e5a applied
+6aae060c15d6 applied
+6113361316d5 applied
+4c6c8722b7d6 applied
+fb33dfc32b13 applied
+9b5961a024af applied
