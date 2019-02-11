@@ -11,7 +11,8 @@ export TZ=UTC
 TOP="$1"
 OUTPUT="$2"
 REV=""
-SOURCE_DATE_EPOCH=""
+
+# The env SOURCE_DATE_EPOCH might be set from outside
 
 if [ "$#" -gt 2 ] ; then
 	echo "$0 [[<topdir>] <outputfile>]"
@@ -63,4 +64,5 @@ EOF
 
 cd "$TOP"
 try_git || try_version || REV="unknown"
+[ -z "$SOURCE_DATE_EPOCH" ] && SOURCE_DATE_EPOCH="$(date %s)"
 output_version
