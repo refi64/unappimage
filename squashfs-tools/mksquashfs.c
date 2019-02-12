@@ -2406,11 +2406,14 @@ void *deflator(void *arg)
 
 void frag_deflator(struct file_buffer *file_buffer)
 {
+	int res, c_byte, compressed_size;
+	struct file_buffer *write_buffer;
 
-	int c_byte, compressed_size;
-	struct file_buffer *write_buffer =
-		cache_get(fwriter_buffer, file_buffer->block);
+	res = compressor_init(comp, &stream, block_size, 1);
+	if(res)
+		BAD_ERROR("frag_deflator:: compressor_init failed\n");
 
+	write_buffer = cache_get(fwriter_buffer, file_buffer->block);
 	c_byte = mangle2(stream, write_buffer->data, file_buffer->data,
 			 file_buffer->size, block_size, noF, 1);
 	compressed_size = SQUASHFS_COMPRESSED_SIZE_BLOCK(c_byte);
