@@ -325,7 +325,7 @@ checkstyle: checkastyle
 		--lineend=linux \
 		--suffix=none \
 		--style=kr \
-		--indent=force-tab \
+		--indent=force-tab=8 \
 		--formatted --recursive "./*.c" "./*.h" | grep -q -i formatted ; then \
 		echo Please fix formatting or run fixstyle ; false ; else \
 		echo Style looks ok. ; fi
@@ -337,7 +337,7 @@ fixstyle: checkastyle
 		--lineend=linux \
 		--suffix=none \
 		--style=kr \
-		--indent=force-tab \
+		--indent=force-tab=8 \
 		--formatted --recursive "./*.c" "./*.h" | grep -q -i formatted ; then \
 		echo "\033[1;33mPrevious files have been corrected\033[00m" ; else \
 		echo "\033[0;32mAll files are ok\033[00m" ; fi
