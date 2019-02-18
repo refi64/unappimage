@@ -73,7 +73,7 @@ static char *get_component(char *target, char **targname)
  * describes the pseudo device attributes.
  */
 struct pseudo *add_pseudo(struct pseudo *pseudo, struct pseudo_dev *pseudo_dev,
-	char *target, char *alltarget)
+			  char *target, char *alltarget)
 {
 	char *targname;
 	int i;
@@ -98,7 +98,7 @@ struct pseudo *add_pseudo(struct pseudo *pseudo, struct pseudo_dev *pseudo_dev,
 		/* allocate new name entry */
 		pseudo->names ++;
 		pseudo->name = realloc(pseudo->name, (i + 1) *
-			sizeof(struct pseudo_entry));
+				       sizeof(struct pseudo_entry));
 		if(pseudo->name == NULL)
 			MEM_ERROR();
 		pseudo->name[i].name = targname;
@@ -112,7 +112,7 @@ struct pseudo *add_pseudo(struct pseudo *pseudo, struct pseudo_dev *pseudo_dev,
 			/* recurse adding child components */
 			pseudo->name[i].dev = NULL;
 			pseudo->name[i].pseudo = add_pseudo(NULL, pseudo_dev,
-				target, alltarget);
+							    target, alltarget);
 		}
 	} else {
 		/* existing matching entry */
@@ -128,26 +128,26 @@ struct pseudo *add_pseudo(struct pseudo *pseudo, struct pseudo_dev *pseudo_dev,
 				 * 'm' type pseudo file
 				 */
 				if(pseudo->name[i].dev->type == 'd' ||
-					pseudo->name[i].dev->type == 'm')
+						pseudo->name[i].dev->type == 'm')
 					/* recurse adding child components */
 					pseudo->name[i].pseudo =
 						add_pseudo(NULL, pseudo_dev,
-						target, alltarget);
+							   target, alltarget);
 				else {
 					ERROR_START("%s already exists as a "
-						"non directory.",
-						pseudo->name[i].name);
+						    "non directory.",
+						    pseudo->name[i].name);
 					ERROR_EXIT(".  Ignoring %s!\n",
-						alltarget);
+						   alltarget);
 				}
 			} else if(memcmp(pseudo_dev, pseudo->name[i].dev,
-					sizeof(struct pseudo_dev)) != 0) {
+					 sizeof(struct pseudo_dev)) != 0) {
 				ERROR_START("%s already exists as a different "
-					"pseudo definition.", alltarget);
+					    "pseudo definition.", alltarget);
 				ERROR_EXIT("  Ignoring!\n");
 			} else {
 				ERROR_START("%s already exists as an identical "
-					"pseudo definition!", alltarget);
+					    "pseudo definition!", alltarget);
 				ERROR_EXIT("  Ignoring!\n");
 			}
 		} else {
@@ -158,21 +158,21 @@ struct pseudo *add_pseudo(struct pseudo *pseudo, struct pseudo_dev *pseudo_dev,
 				 */
 				if(pseudo->name[i].dev == NULL &&
 						(pseudo_dev->type == 'd' ||
-						pseudo_dev->type == 'm')) {
+						 pseudo_dev->type == 'm')) {
 					pseudo->name[i].pathname =
 						strdup(alltarget);
 					pseudo->name[i].dev = pseudo_dev;
 				} else {
 					ERROR_START("%s already exists as a "
-						"different pseudo definition.",
-						pseudo->name[i].name);
+						    "different pseudo definition.",
+						    pseudo->name[i].name);
 					ERROR_EXIT("  Ignoring %s!\n",
-						alltarget);
+						   alltarget);
 				}
 			} else
 				/* recurse adding child components */
 				add_pseudo(pseudo->name[i].pseudo, pseudo_dev,
-					target, alltarget);
+					   target, alltarget);
 		}
 	}
 
@@ -256,7 +256,7 @@ failed:
 void add_pseudo_file(struct pseudo_dev *dev)
 {
 	pseudo_file = realloc(pseudo_file, (pseudo_count + 1) *
-		sizeof(struct pseudo_dev *));
+			      sizeof(struct pseudo_dev *));
 	if(pseudo_file == NULL)
 		MEM_ERROR();
 
@@ -302,61 +302,61 @@ int read_pseudo_def(char *def)
 
 	if(*filename == '\0') {
 		ERROR("Not enough or invalid arguments in pseudo file "
-			"definition \"%s\"\n", orig_def);
+		      "definition \"%s\"\n", orig_def);
 		goto error;
 	}
 
 	n = sscanf(def, " %c %o %99s %99s %n", &type, &mode, suid, sgid,
-		&bytes);
+		   &bytes);
 	def += bytes;
 
 	if(n < 4) {
 		ERROR("Not enough or invalid arguments in pseudo file "
-			"definition \"%s\"\n", orig_def);
+		      "definition \"%s\"\n", orig_def);
 		switch(n) {
 		case -1:
-			/* FALLTHROUGH */
+		/* FALLTHROUGH */
 		case 0:
 			ERROR("Read filename, but failed to read or match "
-				"type\n");
+			      "type\n");
 			break;
 		case 1:
 			ERROR("Read filename and type, but failed to read or "
-				"match octal mode\n");
+			      "match octal mode\n");
 			break;
 		case 2:
 			ERROR("Read filename, type and mode, but failed to "
-				"read or match uid\n");
+			      "read or match uid\n");
 			break;
 		default:
 			ERROR("Read filename, type, mode and uid, but failed "
-				"to read or match gid\n");
-			break; 
+			      "to read or match gid\n");
+			break;
 		}
 		goto error;
 	}
 
 	switch(type) {
 	case 'b':
-		/* FALLTHROUGH */
+	/* FALLTHROUGH */
 	case 'c':
 		n = sscanf(def, "%u %u %n", &major, &minor, &bytes);
 		def += bytes;
 
 		if(n < 2) {
 			ERROR("Not enough or invalid arguments in %s device "
-				"pseudo file definition \"%s\"\n", type == 'b' ?
-				"block" : "character", orig_def);
+			      "pseudo file definition \"%s\"\n", type == 'b' ?
+			      "block" : "character", orig_def);
 			if(n < 1)
 				ERROR("Read filename, type, mode, uid and gid, "
-					"but failed to read or match major\n");
+				      "but failed to read or match major\n");
 			else
 				ERROR("Read filename, type, mode, uid, gid "
-					"and major, but failed to read  or "
-					"match minor\n");
+				      "and major, but failed to read  or "
+				      "match minor\n");
 			goto error;
-		}	
-		
+		}
+
 		if(major > 0xfff) {
 			ERROR("Major %d out of range\n", major);
 			goto error;
@@ -366,27 +366,27 @@ int read_pseudo_def(char *def)
 			ERROR("Minor %d out of range\n", minor);
 			goto error;
 		}
-		/* FALLTHROUGH */
+	/* FALLTHROUGH */
 	case 'd':
-		/* FALLTHROUGH */
+	/* FALLTHROUGH */
 	case 'm':
 		/*
 		 * Check for trailing junk after expected arguments
 		 */
 		if(def[0] != '\0') {
 			ERROR("Unexpected tailing characters in pseudo file "
-				"definition \"%s\"\n", orig_def);
+			      "definition \"%s\"\n", orig_def);
 			goto error;
 		}
 		break;
 	case 'f':
 		if(def[0] == '\0') {
 			ERROR("Not enough arguments in dynamic file pseudo "
-				"definition \"%s\"\n", orig_def);
+			      "definition \"%s\"\n", orig_def);
 			ERROR("Expected command, which can be an executable "
-				"or a piece of shell script\n");
+			      "or a piece of shell script\n");
 			goto error;
-		}	
+		}
 		break;
 	default:
 		ERROR("Unsupported type %c\n", type);
@@ -414,7 +414,7 @@ int read_pseudo_def(char *def)
 			goto error;
 		}
 	}
-		
+
 	gid = strtoll(sgid, &ptr, 10);
 	if(*ptr == '\0') {
 		if(gid < 0 || gid > ((1LL << 32) - 1)) {
@@ -506,9 +506,9 @@ static void dump_pseudo(struct pseudo *pseudo, char *string)
 			path = entry->name;
 		if(entry->dev)
 			ERROR("%s %c 0%o %d %d %d %d\n", path, entry->dev->type,
-				entry->dev->mode & ~S_IFMT, entry->dev->uid,
-				entry->dev->gid, entry->dev->major,
-				entry->dev->minor);
+			      entry->dev->mode & ~S_IFMT, entry->dev->uid,
+			      entry->dev->gid, entry->dev->major,
+			      entry->dev->minor);
 		if(entry->pseudo)
 			dump_pseudo(entry->pseudo, path);
 		if(string)

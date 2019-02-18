@@ -59,7 +59,7 @@ struct priority_entry *priority_list[65536];
 
 extern int silent;
 extern void write_file(squashfs_inode *inode, struct dir_ent *dir_ent,
-	int *c_size);
+		       int *c_size);
 extern char *pathname(struct dir_ent *dir_ent);
 
 
@@ -86,7 +86,7 @@ int get_priority(char *filename, struct stat *buf, int priority)
 	for(s = sort_info_list[hash]; s; s = s->next)
 		if((s->st_dev == buf->st_dev) && (s->st_ino == buf->st_ino)) {
 			TRACE("returning priority %d (%s)\n", s->priority,
-				filename);
+			      filename);
 			return s->priority;
 		}
 	TRACE("returning priority %d (%s)\n", priority, filename);
@@ -121,8 +121,8 @@ re_read:
 		if(lstat(path, &buf) == -1)
 			goto error;
 		TRACE("adding filename %s, priority %d, st_dev %d, st_ino "
-			"%lld\n", path, priority, (int) buf.st_dev,
-			(long long) buf.st_ino);
+		      "%lld\n", path, priority, (int) buf.st_dev,
+		      (long long) buf.st_ino);
 		ADD_ENTRY(buf, priority);
 		return TRUE;
 	}
@@ -145,16 +145,16 @@ re_read:
 
 	if(n == 0 && mkisofs_style == -1 && lstat(path, &buf) != -1) {
 		ERROR("WARNING: Mkisofs style sortlist detected! This is "
-			"supported but please\n");
+		      "supported but please\n");
 		ERROR("convert to mksquashfs style sortlist! A sortlist entry");
-	        ERROR(" should be\neither absolute (starting with ");
+		ERROR(" should be\neither absolute (starting with ");
 		ERROR("'/') start with './' or '../' (taken to be\nrelative to "
-			"$PWD), otherwise it ");
+		      "$PWD), otherwise it ");
 		ERROR("is assumed the entry is relative to one\nof the source "
-			"directories, i.e. with ");
+		      "directories, i.e. with ");
 		ERROR("\"mksquashfs test test.sqsh\",\nthe sortlist ");
 		ERROR("entry \"file\" is assumed to be inside the directory "
-			"test.\n\n");
+		      "test.\n\n");
 		mkisofs_style = 1;
 		goto re_read;
 	}
@@ -165,15 +165,15 @@ re_read:
 		return TRUE;
 	if(n > 1) {
 		ERROR(" Ambiguous sortlist entry \"%s\"\n\nIt maps to more "
-			"than one source entry!  Please use an absolute path."
-			"\n", path);
+		      "than one source entry!  Please use an absolute path."
+		      "\n", path);
 		return FALSE;
 	}
 
 error:
-        ERROR_START("Cannot stat sortlist entry \"%s\"\n", path);
-        ERROR("This is probably because you're using the wrong file\n");
-        ERROR("path relative to the source directories.");
+	ERROR_START("Cannot stat sortlist entry \"%s\"\n", path);
+	ERROR("This is probably because you're using the wrong file\n");
+	ERROR("path relative to the source directories.");
 	ERROR_EXIT("  Ignoring");
 	/*
 	 * Historical note
@@ -183,12 +183,12 @@ error:
 	 * the original behaviour to ignore it in release 2.2-r2 following
 	 * feedback from users at the time.
 	 */
-        return TRUE;
+	return TRUE;
 }
 
 
 void generate_file_priorities(struct dir_info *dir, int priority,
-	struct stat *buf)
+			      struct stat *buf)
 {
 	struct dir_ent *dir_ent = dir->list;
 
@@ -200,15 +200,15 @@ void generate_file_priorities(struct dir_info *dir, int priority,
 			continue;
 
 		switch(buf->st_mode & S_IFMT) {
-			case S_IFREG:
-				add_priority_list(dir_ent,
-					get_priority(pathname(dir_ent), buf,
-					priority));
-				break;
-			case S_IFDIR:
-				generate_file_priorities(dir_ent->dir,
-					priority, buf);
-				break;
+		case S_IFREG:
+			add_priority_list(dir_ent,
+					  get_priority(pathname(dir_ent), buf,
+						       priority));
+			break;
+		case S_IFDIR:
+			generate_file_priorities(dir_ent->dir,
+						 priority, buf);
+			break;
 		}
 	}
 }
@@ -224,7 +224,7 @@ int read_sort_file(char *filename, int source, char *source_path[])
 
 	if((fd = fopen(filename, "r")) == NULL) {
 		ERROR("Failed to open sort file \"%s\" because %s\n",
-			filename, strerror(errno));
+		      filename, strerror(errno));
 		return FALSE;
 	}
 
@@ -234,8 +234,8 @@ int read_sort_file(char *filename, int source, char *source_path[])
 		if(len == MAX_LINE && line[len - 1] != '\n') {
 			/* line too large */
 			ERROR("Line too long when reading "
-				"sort file \"%s\", larger than %d "
-				"bytes\n", filename, MAX_LINE);
+			      "sort file \"%s\", larger than %d "
+			      "bytes\n", filename, MAX_LINE);
 			goto failed;
 		}
 
@@ -286,19 +286,19 @@ int read_sort_file(char *filename, int source, char *source_path[])
 			if(errno == 0)
 				/* No error, assume EOL or match failure */
 				ERROR("Sort file \"%s\", can't find priority "
-					"in entry \"%s\", EOL or match "
-					"failure\n", filename, line_buffer);
+				      "in entry \"%s\", EOL or match "
+				      "failure\n", filename, line_buffer);
 			else
 				/* Some other failure not ERANGE */
 				ERROR("Sscanf failed reading sort file \"%s\" "
-					"because %s\n", filename,
-					strerror(errno));
+				      "because %s\n", filename,
+				      strerror(errno));
 			goto failed;
 		} else if((errno == ERANGE) ||
 				(priority < -32768 || priority > 32767)) {
 			ERROR("Sort file \"%s\", entry \"%s\" has priority "
-				"outside range of -32767:32768.\n", filename,
-				line_buffer);
+			      "outside range of -32767:32768.\n", filename,
+			      line_buffer);
 			goto failed;
 		}
 
@@ -309,20 +309,20 @@ int read_sort_file(char *filename, int source, char *source_path[])
 
 		if(*line != '\0') {
 			ERROR("Sort file \"%s\", trailing characters after "
-				"priority in entry \"%s\"\n", filename,
-				line_buffer);
+			      "priority in entry \"%s\"\n", filename,
+			      line_buffer);
 			goto failed;
 		}
 
 		res = add_sort_list(sort_filename, priority, source,
-			source_path);
+				    source_path);
 		if(res == FALSE)
 			goto failed;
 	}
 
 	if(ferror(fd)) {
 		ERROR("Reading sort file \"%s\" failed because %s\n", filename,
-			strerror(errno));
+		      strerror(errno));
 		goto failed;
 	}
 
@@ -348,16 +348,16 @@ void sort_files_and_write(struct dir_info *dir)
 			if(entry->dir->inode->inode == SQUASHFS_INVALID_BLK) {
 				write_file(&inode, entry->dir, &duplicate_file);
 				INFO("file %s, uncompressed size %lld bytes %s"
-					"\n", pathname(entry->dir),
-					(long long)
-					entry->dir->inode->buf.st_size,
-					duplicate_file ? "DUPLICATE" : "");
+				     "\n", pathname(entry->dir),
+				     (long long)
+				     entry->dir->inode->buf.st_size,
+				     duplicate_file ? "DUPLICATE" : "");
 				entry->dir->inode->inode = inode;
 				entry->dir->inode->type = SQUASHFS_FILE_TYPE;
 			} else
 				INFO("file %s, uncompressed size %lld bytes "
-					"LINK\n", pathname(entry->dir),
-					(long long)
-					entry->dir->inode->buf.st_size);
+				     "LINK\n", pathname(entry->dir),
+				     (long long)
+				     entry->dir->inode->buf.st_size);
 		}
 }

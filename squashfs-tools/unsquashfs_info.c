@@ -76,18 +76,18 @@ void dump_state()
 	dump_queue(to_reader);
 
 	printf("file buffer decompress queue (reader thread -> inflate"
-							" thread(s))\n");
+	       " thread(s))\n");
 	dump_queue(to_inflate);
 
 	printf("file buffer write queue (main thread -> writer thread)\n");
 	dump_queue(to_writer);
 
 	printf("\nbuffer cache (uncompressed blocks and compressed blocks "
-							"'in flight')\n");
+	       "'in flight')\n");
 	dump_cache(data_cache);
 
 	printf("fragment buffer cache (uncompressed frags and compressed"
-						" frags 'in flight')\n");
+	       " frags 'in flight')\n");
 	dump_cache(fragment_cache);
 
 	enable_progress_bar();
@@ -115,14 +115,14 @@ void *info_thrd(void *arg)
 			case EAGAIN:
 				/* interval timed out */
 				waiting = 0;
-				/* FALLTHROUGH */
+			/* FALLTHROUGH */
 			case EINTR:
 				/* if waiting, the wait will be longer, but
 				   that's OK */
 				continue;
 			default:
 				BAD_ERROR("sigtimedwait/sigwaitinfo failed "
-					"because %s\n", strerror(errno));
+					  "because %s\n", strerror(errno));
 			}
 		}
 

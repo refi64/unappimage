@@ -110,7 +110,7 @@ static int get_prefix(struct xattr_list *xattr, char *name)
 	return prefix_table[i].type;
 }
 
-	
+
 static int read_xattrs_from_system(char *filename, struct xattr_list **xattrs)
 {
 	ssize_t size, vsize;
@@ -123,8 +123,8 @@ static int read_xattrs_from_system(char *filename, struct xattr_list **xattrs)
 		if(size <= 0) {
 			if(size < 0 && errno != ENOTSUP) {
 				ERROR_START("llistxattr for %s failed in "
-					"read_attrs, because %s", filename,
-					strerror(errno));
+					    "read_attrs, because %s", filename,
+					    strerror(errno));
 				ERROR_EXIT(".  Ignoring");
 			}
 			return 0;
@@ -142,8 +142,8 @@ static int read_xattrs_from_system(char *filename, struct xattr_list **xattrs)
 				continue;
 			else {
 				ERROR_START("llistxattr for %s failed in "
-					"read_attrs, because %s", filename,
-					strerror(errno));
+					    "read_attrs, because %s", filename,
+					    strerror(errno));
 				ERROR_EXIT(".  Ignoring");
 				return 0;
 			}
@@ -154,7 +154,7 @@ static int read_xattrs_from_system(char *filename, struct xattr_list **xattrs)
 
 	for(i = 0, p = xattr_names; p < xattr_names + size; i++) {
 		struct xattr_list *x = realloc(xattr_list, (i + 1) *
-						sizeof(struct xattr_list));
+					       sizeof(struct xattr_list));
 		if(x == NULL)
 			MEM_ERROR();
 		xattr_list = x;
@@ -163,7 +163,7 @@ static int read_xattrs_from_system(char *filename, struct xattr_list **xattrs)
 		p += strlen(p) + 1;
 		if(xattr_list[i].type == -1) {
 			ERROR("Unrecognised xattr prefix %s\n",
-				xattr_list[i].full_name);
+			      xattr_list[i].full_name);
 			free(xattr_list[i].full_name);
 			i--;
 			continue;
@@ -171,11 +171,11 @@ static int read_xattrs_from_system(char *filename, struct xattr_list **xattrs)
 
 		while(1) {
 			vsize = lgetxattr(filename, xattr_list[i].full_name,
-								NULL, 0);
+					  NULL, 0);
 			if(vsize < 0) {
 				ERROR_START("lgetxattr failed for %s in "
-					"read_attrs, because %s", filename,
-					strerror(errno));
+					    "read_attrs, because %s", filename,
+					    strerror(errno));
 				ERROR_EXIT(".  Ignoring");
 				free(xattr_list[i].full_name);
 				goto failed;
@@ -186,7 +186,7 @@ static int read_xattrs_from_system(char *filename, struct xattr_list **xattrs)
 				MEM_ERROR();
 
 			vsize = lgetxattr(filename, xattr_list[i].full_name,
-						xattr_list[i].value, vsize);
+					  xattr_list[i].value, vsize);
 			if(vsize < 0) {
 				free(xattr_list[i].value);
 				if(errno == ERANGE)
@@ -194,21 +194,21 @@ static int read_xattrs_from_system(char *filename, struct xattr_list **xattrs)
 					continue;
 				else {
 					ERROR_START("lgetxattr failed for %s "
-						"in read_attrs, because %s",
-						filename, strerror(errno));
+						    "in read_attrs, because %s",
+						    filename, strerror(errno));
 					ERROR_EXIT(".  Ignoring");
 					free(xattr_list[i].full_name);
 					goto failed;
 				}
 			}
-			
+
 			break;
 		}
 		xattr_list[i].vsize = vsize;
 
 		TRACE("read_xattrs_from_system: filename %s, xattr name %s,"
-			" vsize %d\n", filename, xattr_list[i].full_name,
-			xattr_list[i].vsize);
+		      " vsize %d\n", filename, xattr_list[i].full_name,
+		      xattr_list[i].vsize);
 	}
 	free(xattr_names);
 	*xattrs = xattr_list;
@@ -228,7 +228,7 @@ failed:
 static int get_xattr_size(struct xattr_list *xattr)
 {
 	int size = sizeof(struct squashfs_xattr_entry) +
-		sizeof(struct squashfs_xattr_val) + xattr->size;
+		   sizeof(struct squashfs_xattr_val) + xattr->size;
 
 	if(xattr->type & XATTR_VALUE_OOL)
 		size += XATTR_VALUE_OOL_SIZE;
@@ -251,15 +251,15 @@ static void *get_xattr_space(unsigned int req_size, long long *disk)
 		if((xattr_size - xattr_bytes) <
 				((SQUASHFS_METADATA_SIZE << 1)) + 2) {
 			xattr_table = realloc(xattr_table, xattr_size +
-				(SQUASHFS_METADATA_SIZE << 1) + 2);
+					      (SQUASHFS_METADATA_SIZE << 1) + 2);
 			if(xattr_table == NULL)
 				MEM_ERROR();
 			xattr_size += (SQUASHFS_METADATA_SIZE << 1) + 2;
 		}
 
 		c_byte = mangle(xattr_table + xattr_bytes + BLOCK_OFFSET,
-			data_cache, SQUASHFS_METADATA_SIZE,
-			SQUASHFS_METADATA_SIZE, noX, 0);
+				data_cache, SQUASHFS_METADATA_SIZE,
+				SQUASHFS_METADATA_SIZE, noX, 0);
 		TRACE("Xattr block @ 0x%x, size %d\n", xattr_bytes, c_byte);
 		SQUASHFS_SWAP_SHORTS(&c_byte, xattr_table + xattr_bytes, 1);
 		xattr_bytes += SQUASHFS_COMPRESSED_SIZE(c_byte) + BLOCK_OFFSET;
@@ -273,12 +273,12 @@ static void *get_xattr_space(unsigned int req_size, long long *disk)
 	 */
 	data_space = cache_size - cache_bytes;
 	if(data_space < req_size) {
-			int realloc_size = req_size - data_space;
-			data_cache = realloc(data_cache, cache_size +
-				realloc_size);
-			if(data_cache == NULL)
-				MEM_ERROR();
-			cache_size += realloc_size;
+		int realloc_size = req_size - data_space;
+		data_cache = realloc(data_cache, cache_size +
+				     realloc_size);
+		if(data_cache == NULL)
+			MEM_ERROR();
+		cache_size += realloc_size;
 	}
 
 	if(disk)
@@ -318,7 +318,7 @@ static struct dupl_id *check_id_dupl(struct xattr_list *xattr_list, int xattrs)
 			if(memcmp(xattr->value, dup_xattr->value, xattr->vsize))
 				break;
 		}
-		
+
 		if(i == xattrs)
 			break;
 	}
@@ -334,7 +334,7 @@ static struct dupl_id *check_id_dupl(struct xattr_list *xattr_list, int xattrs)
 		entry->next = dupl_id[checksum];
 		dupl_id[checksum] = entry;
 	}
-		
+
 	return entry;
 }
 
@@ -351,7 +351,7 @@ static void check_value_dupl(struct xattr_list *xattr)
 	for(entry = dupl_value[xattr->vchecksum]; entry; entry = entry->vnext) {
 		if(entry->vsize != xattr->vsize)
 			continue;
-		
+
 		if(memcmp(entry->value, xattr->value, xattr->vsize) == 0)
 			break;
 	}
@@ -382,13 +382,13 @@ static void check_value_dupl(struct xattr_list *xattr)
 
 
 static int get_xattr_id(int xattrs, struct xattr_list *xattr_list,
-		long long xattr_disk, struct dupl_id *xattr_dupl)
+			long long xattr_disk, struct dupl_id *xattr_dupl)
 {
 	int i, size = 0;
 	struct squashfs_xattr_id *xattr_id;
 
 	xattr_id_table = realloc(xattr_id_table, (xattr_ids + 1) *
-		sizeof(struct squashfs_xattr_id));
+				 sizeof(struct squashfs_xattr_id));
 	if(xattr_id_table == NULL)
 		MEM_ERROR();
 
@@ -411,7 +411,7 @@ static int get_xattr_id(int xattrs, struct xattr_list *xattr_list,
 	xattr_dupl->xattr_id = xattr_ids ++;
 	return xattr_dupl->xattr_id;
 }
-	
+
 
 long long write_xattrs()
 {
@@ -431,16 +431,16 @@ long long write_xattrs()
 		if((xattr_size - xattr_bytes) <
 				((SQUASHFS_METADATA_SIZE << 1)) + 2) {
 			xattr_table = realloc(xattr_table, xattr_size +
-				(SQUASHFS_METADATA_SIZE << 1) + 2);
+					      (SQUASHFS_METADATA_SIZE << 1) + 2);
 			if(xattr_table == NULL)
 				MEM_ERROR();
 			xattr_size += (SQUASHFS_METADATA_SIZE << 1) + 2;
 		}
 
 		avail_bytes = cache_bytes > SQUASHFS_METADATA_SIZE ?
-			SQUASHFS_METADATA_SIZE : cache_bytes;
+			      SQUASHFS_METADATA_SIZE : cache_bytes;
 		c_byte = mangle(xattr_table + xattr_bytes + BLOCK_OFFSET, datap,
-			avail_bytes, SQUASHFS_METADATA_SIZE, noX, 0);
+				avail_bytes, SQUASHFS_METADATA_SIZE, noX, 0);
 		TRACE("Xattr block @ 0x%x, size %d\n", xattr_bytes, c_byte);
 		SQUASHFS_SWAP_SHORTS(&c_byte, xattr_table + xattr_bytes, 1);
 		xattr_bytes += SQUASHFS_COMPRESSED_SIZE(c_byte) + BLOCK_OFFSET;
@@ -452,7 +452,7 @@ long long write_xattrs()
 	 * Write compressed xattr table to file system
 	 */
 	write_destination(fd, bytes, xattr_bytes, xattr_table);
-        bytes += xattr_bytes;
+	bytes += xattr_bytes;
 
 	/*
 	 * Swap if necessary the xattr id table
@@ -465,7 +465,7 @@ long long write_xattrs()
 	SQUASHFS_INSWAP_XATTR_TABLE(&header);
 
 	return generic_write_table(xattr_ids * sizeof(struct squashfs_xattr_id),
-		xattr_id_table, sizeof(header), &header, noX);
+				   xattr_id_table, sizeof(header), &header, noX);
 }
 
 
@@ -484,7 +484,7 @@ int generate_xattrs(int xattrs, struct xattr_list *xattr_list)
 	xattr_dupl = check_id_dupl(xattr_list, xattrs);
 	if(xattr_dupl->xattr_id != SQUASHFS_INVALID_XATTR)
 		return xattr_dupl->xattr_id;
-	 
+
 	/*
 	 * Scan the xattr_list deciding which type to assign to each
 	 * xattr.  The choice is fairly straightforward, and depends on the
@@ -586,7 +586,7 @@ int generate_xattrs(int xattrs, struct xattr_list *xattr_list)
 			val.vsize = XATTR_VALUE_OOL_SIZE;
 			SQUASHFS_SWAP_XATTR_VAL(&val, xp);
 			SQUASHFS_SWAP_LONG_LONGS(&xattr->ool_value, xp +
-				sizeof(val), 1);
+						 sizeof(val), 1);
 		} else {
 			int size = sizeof(val) + xattr->vsize;
 			xp = get_xattr_space(size, &xattr->ool_value);

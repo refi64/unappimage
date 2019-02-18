@@ -37,7 +37,7 @@
 #define MEMLIMIT (32 * 1024 * 1024)
 
 static int lzma_compress(void *dummy, void *dest, void *src,  int size,
-	int block_size, int *error)
+			 int block_size, int *error)
 {
 	uint32_t preset;
 	unsigned char *d = (unsigned char *) dest;
@@ -77,11 +77,11 @@ static int lzma_compress(void *dummy, void *dest, void *src,  int size,
 
 	if(res == LZMA_STREAM_END) {
 		/*
-	 	 * Fill in the 8 byte little endian uncompressed size field in
+		 * Fill in the 8 byte little endian uncompressed size field in
 		 * the LZMA header.  8 bytes is excessively large for squashfs
 		 * but this is the standard LZMA header and which is expected by
 		 * the kernel code
-	 	 */
+		 */
 
 		d[LZMA_PROPS_SIZE] = size & 255;
 		d[LZMA_PROPS_SIZE + 1] = (size >> 8) & 255;
@@ -97,8 +97,8 @@ static int lzma_compress(void *dummy, void *dest, void *src,  int size,
 
 	if(res == LZMA_OK)
 		/*
-	 	 * Output buffer overflow.  Return out of buffer space
-	 	 */
+		 * Output buffer overflow.  Return out of buffer space
+		 */
 		return 0;
 
 failed:
@@ -112,7 +112,7 @@ failed:
 
 
 static int lzma_uncompress(void *dest, void *src, int size, int outsize,
-	int *error)
+			   int *error)
 {
 	lzma_stream strm = LZMA_STREAM_INIT;
 	int uncompressed_size = 0, res;
@@ -126,9 +126,9 @@ static int lzma_uncompress(void *dest, void *src, int size, int outsize,
 
 	memcpy(lzma_header, src, LZMA_HEADER_SIZE);
 	uncompressed_size = lzma_header[LZMA_PROPS_SIZE] |
-		(lzma_header[LZMA_PROPS_SIZE + 1] << 8) |
-		(lzma_header[LZMA_PROPS_SIZE + 2] << 16) |
-		(lzma_header[LZMA_PROPS_SIZE + 3] << 24);
+			    (lzma_header[LZMA_PROPS_SIZE + 1] << 8) |
+			    (lzma_header[LZMA_PROPS_SIZE + 2] << 16) |
+			    (lzma_header[LZMA_PROPS_SIZE + 3] << 24);
 
 	if(uncompressed_size > outsize) {
 		res = 0;
@@ -156,7 +156,7 @@ static int lzma_uncompress(void *dest, void *src, int size, int outsize,
 	lzma_end(&strm);
 
 	if(res == LZMA_STREAM_END || (res == LZMA_OK &&
-		strm.total_out >= uncompressed_size && strm.avail_in == 0))
+				      strm.total_out >= uncompressed_size && strm.avail_in == 0))
 		return uncompressed_size;
 
 failed:

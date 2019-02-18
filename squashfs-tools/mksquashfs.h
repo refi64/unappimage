@@ -135,7 +135,7 @@ struct append_file {
 extern struct cache *reader_buffer, *fragment_buffer, *reserve_cache;
 struct cache *bwriter_buffer, *fwriter_buffer;
 extern struct queue *to_reader, *to_deflate, *to_writer, *from_writer,
-	*locked_fragment, *to_process_frag;
+	       *locked_fragment, *to_process_frag;
 extern struct append_file **file_mapping;
 extern struct seq_queue *to_main;
 extern pthread_mutex_t fragment_mutex, dup_mutex;
@@ -145,7 +145,7 @@ extern int block_size;
 extern struct file_info *dupl[];
 extern int read_fs_bytes(int, long long, int, void *);
 extern void add_file(long long, long long, long long, unsigned int *, int,
-	unsigned int, int, int);
+		     unsigned int, int, int);
 extern struct id *create_id(unsigned int);
 extern unsigned int get_uid(unsigned int);
 extern unsigned int get_guid(unsigned int);

@@ -82,11 +82,11 @@ static int read_filesystem(int fd, long long byte, int bytes, void *buff)
 	off_t off = byte;
 
 	TRACE("read_filesystem: reading from position 0x%llx, bytes %d\n",
-		byte, bytes);
+	      byte, bytes);
 
 	if(lseek(fd, off, SEEK_SET) == -1) {
 		ERROR("read_filesystem: Lseek on destination failed because %s, "
-			"offset=0x%llx\n", strerror(errno), off);
+		      "offset=0x%llx\n", strerror(errno), off);
 		return 0;
 	} else if(read_bytes(fd, buff, bytes) < bytes) {
 		ERROR("Read on destination failed\n");
@@ -98,7 +98,7 @@ static int read_filesystem(int fd, long long byte, int bytes, void *buff)
 
 
 static struct file_buffer *get_fragment(struct fragment *fragment,
-	char *data_buffer, int fd)
+					char *data_buffer, int fd)
 {
 	struct squashfs_fragment_entry *disk_fragment;
 	struct file_buffer *buffer, *compressed_buffer;
@@ -184,24 +184,24 @@ again:
 			res = read_filesystem(fd, start_block, size, data_buffer);
 			if(res == 0) {
 				ERROR("Failed to read fragment from output"
-					" filesystem\n");
+				      " filesystem\n");
 				BAD_ERROR("Output filesystem corrupted?\n");
 			}
 			data = data_buffer;
 		}
 
 		res = compressor_uncompress(comp, buffer->data, data, size,
-			block_size, &error);
+					    block_size, &error);
 		if(res == -1)
 			BAD_ERROR("%s uncompress failed with error code %d\n",
-				comp->name, error);
+				  comp->name, error);
 	} else if(compressed_buffer)
 		memcpy(buffer->data, compressed_buffer->data, size);
 	else {
 		res = read_filesystem(fd, start_block, size, buffer->data);
 		if(res == 0) {
 			ERROR("Failed to read fragment from output "
-				"filesystem\n");
+			      "filesystem\n");
 			BAD_ERROR("Output filesystem corrupted?\n");
 		}
 	}
@@ -218,7 +218,7 @@ finished:
 
 
 struct file_buffer *get_fragment_cksum(struct file_info *file,
-	char *data_buffer, int fd, unsigned short *checksum)
+				       char *data_buffer, int fd, unsigned short *checksum)
 {
 	struct file_buffer *frag_buffer;
 	struct append_file *append;
@@ -337,19 +337,19 @@ void *frag_thrd(void *destination_file)
 			 */
 			if(!flag) {
 				buffer = get_fragment_cksum(dupl_ptr,
-					data_buffer, fd, &checksum);
+							    data_buffer, fd, &checksum);
 				if(checksum != file_buffer->checksum) {
 					cache_block_put(buffer);
 					continue;
 				}
 			} else if(checksum == file_buffer->checksum)
 				buffer = get_fragment(dupl_ptr->fragment,
-					data_buffer, fd);
+						      data_buffer, fd);
 			else
 				continue;
 
 			res = memcmp(file_buffer->data, buffer->data +
-				dupl_ptr->fragment->offset, file_size);
+				     dupl_ptr->fragment->offset, file_size);
 			cache_block_put(buffer);
 			if(res == 0) {
 				struct file_buffer *dup = malloc(sizeof(*dup));

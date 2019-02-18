@@ -83,7 +83,7 @@ static int xz_options(char *argv[], int argc)
 						(name[n] == '\0' ||
 						 name[n] == ',')) {
 					if(bcj[i].selected == 0) {
-				 		bcj[i].selected = 1;
+						bcj[i].selected = 1;
 						filter_count++;
 					}
 					name += name[n] == ',' ? n + 1 : n;
@@ -96,7 +96,7 @@ static int xz_options(char *argv[], int argc)
 				return -2;
 			}
 		}
-	
+
 		return 1;
 	} else {
 		return lzma_xz_options(argv, argc, LZMA_OPT_XZ);
@@ -202,7 +202,7 @@ void xz_display_options(void *buffer, int size)
 	 * size should 2^n or 2^n+2^(n+1)
 	 */
 	n = ffs(dictionary_size) - 1;
-	if(dictionary_size != (1 << n) && 
+	if(dictionary_size != (1 << n) &&
 			dictionary_size != ((1 << n) + (1 << (n + 1))))
 		goto failed;
 
@@ -230,7 +230,7 @@ void xz_display_options(void *buffer, int size)
 failed:
 	fprintf(stderr, "xz: error reading stored compressor options from "
 		"filesystem!\n");
-}	
+}
 
 
 /*
@@ -260,7 +260,7 @@ static int xz_init(void **strm, int block_size, int datablock)
 	memset(filter, 0, filters * sizeof(struct filter));
 
 	stream->dictionary_size = datablock ? opts->dict_size :
-		SQUASHFS_METADATA_SIZE;
+				  SQUASHFS_METADATA_SIZE;
 
 	filter[0].filter[0].id = LZMA_FILTER_LZMA2;
 	filter[0].filter[0].options = &stream->opt;
@@ -295,10 +295,10 @@ failed:
 
 
 static int xz_compress(void *strm, void *dest, void *src,  int size,
-	int block_size, int *error)
+		       int block_size, int *error)
 {
 	int i;
-        lzma_ret res = 0;
+	lzma_ret res = 0;
 	struct xz_stream *stream = strm;
 	struct filter *selected = NULL;
 	struct lzma_xz_options *opts = lzma_xz_get_options();
@@ -312,22 +312,22 @@ static int xz_compress(void *strm, void *dest, void *src,  int size,
 		if (opts->extreme)
 			preset |= LZMA_PRESET_EXTREME;
 
-        if(lzma_lzma_preset(&stream->opt, preset))
-               	goto failed;
+		if(lzma_lzma_preset(&stream->opt, preset))
+			goto failed;
 
-        stream->opt.lc = opts->lc;
-    	stream->opt.lp = opts->lp;
-    	stream->opt.pb = opts->pb;
-    	if (opts->fb)
-    		stream->opt.nice_len = opts->fb;
+		stream->opt.lc = opts->lc;
+		stream->opt.lp = opts->lp;
+		stream->opt.pb = opts->pb;
+		if (opts->fb)
+			stream->opt.nice_len = opts->fb;
 
 		stream->opt.dict_size = stream->dictionary_size;
 
 		filter->length = 0;
 		res = lzma_stream_buffer_encode(filter->filter,
-			LZMA_CHECK_CRC32, NULL, src, size, filter->buffer,
-			&filter->length, block_size);
-	
+						LZMA_CHECK_CRC32, NULL, src, size, filter->buffer,
+						&filter->length, block_size);
+
 		if(res == LZMA_OK) {
 			if(!selected || selected->length > filter->length)
 				selected = filter;
@@ -337,8 +337,8 @@ static int xz_compress(void *strm, void *dest, void *src,  int size,
 
 	if(!selected)
 		/*
-	 	 * Output buffer overflow.  Return out of buffer space
-	 	 */
+		 * Output buffer overflow.  Return out of buffer space
+		 */
 		return 0;
 
 	if(selected->buffer != dest)
@@ -357,7 +357,7 @@ failed:
 
 
 static int xz_uncompress(void *dest, void *src, int size, int outsize,
-	int *error)
+			 int *error)
 {
 	size_t src_pos = 0;
 	size_t dest_pos = 0;

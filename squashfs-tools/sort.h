@@ -1,4 +1,4 @@
-#ifndef SORT_H 
+#ifndef SORT_H
 #define SORT_H
 
 /*
@@ -32,6 +32,6 @@ struct priority_entry {
 extern int read_sort_file(char *, int, char *[]);
 extern void sort_files_and_write(struct dir_info *);
 extern void generate_file_priorities(struct dir_info *, int priority,
-	struct stat *);
+				     struct stat *);
 extern struct  priority_entry *priority_list[65536];
 #endif

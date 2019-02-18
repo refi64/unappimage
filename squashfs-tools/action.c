@@ -110,7 +110,7 @@ static int get_token(char **string)
 			return TOK_EOF;
 		for (i = 0; token_table[i].token != -1; i++)
 			if (strncmp(cur_ptr, token_table[i].string,
-						token_table[i].size) == 0)
+					token_table[i].size) == 0)
 				break;
 		if (token_table[i].token != TOK_WHITE_SPACE)
 			break;
@@ -284,7 +284,7 @@ static struct expr *parse_test(char *name)
 	if(parsing_action->type == EXCLUDE_ACTION && !test->exclude_ok) {
 		fprintf(stderr, "Failed to parse action \"%s\"\n", source);
 		fprintf(stderr, "Test \"%s\" cannot be used in exclude "
-							"actions\n", name);
+			"actions\n", name);
 		fprintf(stderr, "Use prune action instead ...\n");
 		return NULL;
 	}
@@ -305,7 +305,7 @@ static struct expr *parse_test(char *name)
 	token = peek_token(&string);
 
 	if (token != TOK_OPEN_BRACKET)
-			goto skip_args;
+		goto skip_args;
 
 	get_token(&string);
 
@@ -321,7 +321,7 @@ static struct expr *parse_test(char *name)
 	while(1) {
 		if (token != TOK_STRING) {
 			SYNTAX_ERROR("Unexpected token \"%s\", expected "
-				"argument\n", TOK_TO_STR(token, string));
+				     "argument\n", TOK_TO_STR(token, string));
 			goto failed;
 		}
 
@@ -338,7 +338,7 @@ static struct expr *parse_test(char *name)
 
 		if (token != TOK_COMMA) {
 			SYNTAX_ERROR("Unexpected token \"%s\", expected "
-				"\",\" or \")\"\n", TOK_TO_STR(token, string));
+				     "\",\" or \")\"\n", TOK_TO_STR(token, string));
 			goto failed;
 		}
 		token = get_token(&string);
@@ -350,7 +350,7 @@ skip_args:
 	 */
 	if(test->args != -2 && args != test->args) {
 		SYNTAX_ERROR("Unexpected number of arguments, expected %d, "
-			"got %d\n", test->args, args);
+			     "got %d\n", test->args, args);
 		goto failed;
 	}
 
@@ -360,7 +360,7 @@ skip_args:
 	if (test->parse_args) {
 		int res = test->parse_args(test, &expr->atom);
 
-		if (res == 0)		
+		if (res == 0)
 			goto failed;
 	}
 
@@ -387,8 +387,8 @@ static struct expr *get_atom()
 		return parse_test(string);
 	default:
 		SYNTAX_ERROR("Unexpected token \"%s\", expected test "
-					"operation, \"!\", or \"(\"\n",
-					TOK_TO_STR(token, string));
+			     "operation, \"!\", or \"(\"\n",
+			     TOK_TO_STR(token, string));
 		return NULL;
 	}
 }
@@ -406,7 +406,7 @@ static struct expr *parse_expr(int subexp)
 			if (subexp) {
 				free_parse_tree(expr);
 				SYNTAX_ERROR("Expected \"&&\", \"||\" or "
-						"\")\", got EOF\n");
+					     "\")\", got EOF\n");
 				return NULL;
 			}
 			break;
@@ -416,16 +416,16 @@ static struct expr *parse_expr(int subexp)
 			if (!subexp) {
 				free_parse_tree(expr);
 				SYNTAX_ERROR("Unexpected \")\", expected "
-						"\"&&\", \"!!\" or EOF\n");
+					     "\"&&\", \"!!\" or EOF\n");
 				return NULL;
 			}
 			break;
 		}
-		
+
 		if (op != TOK_AND && op != TOK_OR) {
 			free_parse_tree(expr);
 			SYNTAX_ERROR("Unexpected token \"%s\", expected "
-				"\"&&\" or \"||\"\n", TOK_TO_STR(op, string));
+				     "\"&&\" or \"||\"\n", TOK_TO_STR(op, string));
 			return NULL;
 		}
 
@@ -454,7 +454,7 @@ int parse_action(char *s, int verbose)
 
 	if (token != TOK_STRING) {
 		SYNTAX_ERROR("Unexpected token \"%s\", expected name\n",
-						TOK_TO_STR(token, string));
+			     TOK_TO_STR(token, string));
 		return 0;
 	}
 
@@ -476,7 +476,7 @@ int parse_action(char *s, int verbose)
 
 	if (token != TOK_OPEN_BRACKET) {
 		SYNTAX_ERROR("Unexpected token \"%s\", expected \"(\"\n",
-						TOK_TO_STR(token, string));
+			     TOK_TO_STR(token, string));
 		goto failed;
 	}
 
@@ -492,7 +492,7 @@ int parse_action(char *s, int verbose)
 	while (1) {
 		if (token != TOK_STRING) {
 			SYNTAX_ERROR("Unexpected token \"%s\", expected "
-				"argument\n", TOK_TO_STR(token, string));
+				     "argument\n", TOK_TO_STR(token, string));
 			goto failed;
 		}
 
@@ -509,7 +509,7 @@ int parse_action(char *s, int verbose)
 
 		if (token != TOK_COMMA) {
 			SYNTAX_ERROR("Unexpected token \"%s\", expected "
-				"\",\" or \")\"\n", TOK_TO_STR(token, string));
+				     "\",\" or \")\"\n", TOK_TO_STR(token, string));
 			goto failed;
 		}
 		token = get_token(&string);
@@ -521,7 +521,7 @@ skip_args:
 	 */
 	if(action->args != -2 && args != action->args) {
 		SYNTAX_ERROR("Unexpected number of arguments, expected %d, "
-			"got %d\n", action->args, args);
+			     "got %d\n", action->args, args);
 		goto failed;
 	}
 
@@ -537,10 +537,10 @@ skip_args:
 
 	if (token != TOK_AT) {
 		SYNTAX_ERROR("Unexpected token \"%s\", expected \"@\"\n",
-						TOK_TO_STR(token, string));
+			     TOK_TO_STR(token, string));
 		goto failed;
 	}
-	
+
 	parsing_action = action;
 	expr = parse_expr(0);
 
@@ -575,9 +575,9 @@ skip_args:
 		spec_count = other_count ++;
 		spec_list = &other_spec;
 	}
-	
+
 	*spec_list = realloc(*spec_list, (spec_count + 1) *
-					sizeof(struct action));
+			     sizeof(struct action));
 	if (*spec_list == NULL)
 		MEM_ERROR();
 
@@ -633,7 +633,7 @@ char *_expr_log(char *string, int cmnd)
 	}
 
 	/* if string is empty append '\0' */
-	size = strlen(string) ? : 1; 
+	size = strlen(string) ? : 1;
 
 	if(alloc_size - cur_size < size) {
 		/* buffer too small, expand */
@@ -645,7 +645,7 @@ char *_expr_log(char *string, int cmnd)
 	}
 
 	memcpy(expr_msg + cur_size, string, size);
-	cur_size += size; 
+	cur_size += size;
 
 	return expr_msg;
 }
@@ -739,7 +739,7 @@ static int eval_expr(struct expr *expr, struct action_data *action_data)
 		match = eval_expr(expr->expr_op.lhs, action_data);
 
 		if ((expr->expr_op.op == TOK_AND && match) ||
-					(expr->expr_op.op == TOK_OR && !match))
+				(expr->expr_op.op == TOK_OR && !match))
 			match = eval_expr(expr->expr_op.rhs, action_data);
 		break;
 	}
@@ -799,7 +799,7 @@ static int eval_expr_top(struct action *action, struct action_data *action_data)
  *	action(arg1,arg2)@expr(arg1,arg2)....
  *
  * Actions can be split across multiple lines using "\".
- * 
+ *
  * Blank lines and comment lines indicated by # are supported.
  */
 int parse_action_true(char *s)
@@ -853,8 +853,8 @@ static int file_type_match(int st_mode, int type)
 		return S_ISREG(st_mode);
 	case ACTION_ALL:
 		return S_ISREG(st_mode) || S_ISDIR(st_mode) ||
-			S_ISCHR(st_mode) || S_ISBLK(st_mode) ||
-			S_ISFIFO(st_mode) || S_ISSOCK(st_mode);
+		       S_ISCHR(st_mode) || S_ISBLK(st_mode) ||
+		       S_ISFIFO(st_mode) || S_ISSOCK(st_mode);
 	case ACTION_LNK:
 		return S_ISLNK(st_mode);
 	case ACTION_ALL_LNK:
@@ -949,7 +949,7 @@ void *get_frag_action(void *fragment)
 
 	if (fragment == &def_fragment)
 		action = &fragment_spec[0] - 1;
-	else 
+	else
 		action = fragment - offsetof(struct action, data);
 
 	if (++action == spec_list_end)
@@ -969,7 +969,7 @@ int exclude_actions()
 
 
 int eval_exclude_actions(char *name, char *pathname, char *subpath,
-	struct stat *buf, int depth, struct dir_ent *dir_ent)
+			 struct stat *buf, int depth, struct dir_ent *dir_ent)
 {
 	int i, match = 0;
 	struct action_data action_data;
@@ -1041,7 +1041,8 @@ static void uncomp_action(struct action *action, struct dir_ent *dir_ent)
 /*
  * Uid/gid specific action code
  */
-static long long parse_uid(char *arg) {
+static long long parse_uid(char *arg)
+{
 	char *b;
 	long long uid = strtoll(arg, &b, 10);
 
@@ -1065,7 +1066,8 @@ static long long parse_uid(char *arg) {
 }
 
 
-static long long parse_gid(char *arg) {
+static long long parse_gid(char *arg)
+{
 	char *b;
 	long long gid = strtoll(arg, &b, 10);
 
@@ -1090,7 +1092,7 @@ static long long parse_gid(char *arg) {
 
 
 static int parse_uid_args(struct action_entry *action, int args, char **argv,
-								void **data)
+			  void **data)
 {
 	long long uid;
 	struct uid_info *uid_info;
@@ -1111,7 +1113,7 @@ static int parse_uid_args(struct action_entry *action, int args, char **argv,
 
 
 static int parse_gid_args(struct action_entry *action, int args, char **argv,
-								void **data)
+			  void **data)
 {
 	long long gid;
 	struct gid_info *gid_info;
@@ -1132,7 +1134,7 @@ static int parse_gid_args(struct action_entry *action, int args, char **argv,
 
 
 static int parse_guid_args(struct action_entry *action, int args, char **argv,
-								void **data)
+			   void **data)
 {
 	long long uid, gid;
 	struct guid_info *guid_info;
@@ -1188,7 +1190,7 @@ static void guid_action(struct action *action, struct dir_ent *dir_ent)
  * Mode specific action code
  */
 static int parse_octal_mode_args(int args, char **argv,
-			void **data)
+				 void **data)
 {
 	int n, bytes;
 	unsigned int mode;
@@ -1203,14 +1205,14 @@ static int parse_octal_mode_args(int args, char **argv,
 	/* check there's no trailing junk */
 	if (argv[0][bytes] != '\0') {
 		SYNTAX_ERROR("Unexpected trailing bytes after octal "
-			"mode number\n");
+			     "mode number\n");
 		return 0; /* bad octal number arg */
 	}
 
 	/* check there's only one argument */
 	if (args > 1) {
 		SYNTAX_ERROR("Octal mode number is first argument, "
-			"expected one argument, got %d\n", args);
+			     "expected one argument, got %d\n", args);
 		return 0; /* bad octal number arg */
 	}
 
@@ -1238,7 +1240,7 @@ static int parse_octal_mode_args(int args, char **argv,
  * PERMS = [rwxXst]+ or [ugo]
  */
 static int parse_sym_mode_arg(char *arg, struct mode_data **head,
-	struct mode_data **cur)
+			      struct mode_data **cur)
 {
 	struct mode_data *mode_data;
 	int mode;
@@ -1296,19 +1298,19 @@ parse_operation:
 			break;
 		default:
 			SYNTAX_ERROR("Expected one of '+', '-' or '=', got "
-				"'%c'\n", *arg);
+				     "'%c'\n", *arg);
 			goto failed;
 		}
-	
+
 		arg ++;
-	
+
 		/* Parse PERMS */
 		if (*arg == 'u' || *arg == 'g' || *arg == 'o') {
-	 		/* PERMS = [ugo] */
+			/* PERMS = [ugo] */
 			mode = - *arg;
 			arg ++;
 		} else {
-	 		/* PERMS = [rwxXst]* */
+			/* PERMS = [rwxXst]* */
 			while(1) {
 				switch(*arg) {
 				case 'r':
@@ -1337,14 +1339,14 @@ parse_operation:
 					goto perms_parsed;
 				default:
 					SYNTAX_ERROR("Unrecognised permission "
-								"'%c'\n", *arg);
+						     "'%c'\n", *arg);
 					goto failed;
 				}
-	
+
 				arg ++;
 			}
 		}
-	
+
 perms_parsed:
 		mode_data = malloc(sizeof(*mode_data));
 		if (mode_data == NULL)
@@ -1371,7 +1373,7 @@ failed:
 
 
 static int parse_sym_mode_args(struct action_entry *action, int args,
-					char **argv, void **data)
+			       char **argv, void **data)
 {
 	int i, res = 1;
 	struct mode_data *head = NULL, *cur = NULL;
@@ -1386,7 +1388,7 @@ static int parse_sym_mode_args(struct action_entry *action, int args,
 
 
 static int parse_mode_args(struct action_entry *action, int args,
-					char **argv, void **data)
+			   char **argv, void **data)
 {
 	int res;
 
@@ -1408,7 +1410,7 @@ static int mode_execute(struct mode_data *mode_data, int st_mode)
 {
 	int mode = 0;
 
-	for (;mode_data; mode_data = mode_data->next) {
+	for (; mode_data; mode_data = mode_data->next) {
 		if (mode_data->mode < 0) {
 			/* 'u', 'g' or 'o' */
 			switch(-mode_data->mode) {
@@ -1423,10 +1425,10 @@ static int mode_execute(struct mode_data *mode_data, int st_mode)
 				break;
 			}
 			mode = ((mode << 6) | (mode << 3) | mode) &
-				mode_data->mask;
+			       mode_data->mask;
 		} else if (mode_data->X &&
 				((st_mode & S_IFMT) == S_IFDIR ||
-				(st_mode & 0111)))
+				 (st_mode & 0111)))
 			/* X permission, only takes effect if inode is a
 			 * directory or x is set for some owner */
 			mode = mode_data->mode | (0111 & mode_data->mask);
@@ -1455,7 +1457,7 @@ static int mode_execute(struct mode_data *mode_data, int st_mode)
 static void mode_action(struct action *action, struct dir_ent *dir_ent)
 {
 	dir_ent->inode->buf.st_mode = mode_execute(action->data,
-					dir_ent->inode->buf.st_mode);
+				      dir_ent->inode->buf.st_mode);
 }
 
 
@@ -1469,7 +1471,7 @@ int empty_actions()
 
 
 static int parse_empty_args(struct action_entry *action, int args,
-					char **argv, void **data)
+			    char **argv, void **data)
 {
 	struct empty_data *empty_data;
 	int val;
@@ -1487,8 +1489,8 @@ static int parse_empty_args(struct action_entry *action, int args,
 		val = EMPTY_EXCLUDED;
 	else {
 		SYNTAX_ERROR("Empty action expects zero arguments, or one"
-			"argument containing \"all\", \"source\", or \"excluded\""
-			"\n");
+			     "argument containing \"all\", \"source\", or \"excluded\""
+			     "\n");
 		return 0;
 	}
 
@@ -1544,7 +1546,7 @@ int eval_empty_actions(struct dir_info *root, struct dir_ent *dir_ent)
 		if ((data->val == EMPTY_EXCLUDED && !dir->excluded) ||
 				(data->val == EMPTY_SOURCE && dir->excluded))
 			continue;
-		
+
 		match = eval_expr_top(&empty_spec[i], &action_data);
 	}
 
@@ -1574,9 +1576,9 @@ static char *move_pathname(struct move_ent *move)
 	int res;
 
 	dest = (move->ops & ACTION_MOVE_MOVE) ?
-		move->dest : move->dir_ent->our_dir;
+	       move->dest : move->dir_ent->our_dir;
 	name = (move->ops & ACTION_MOVE_RENAME) ?
-		move->name : move->dir_ent->name;
+	       move->name : move->dir_ent->name;
 
 	if(dest->subpath[0] != '\0')
 		res = asprintf(&pathname, "%s/%s", dest->subpath, name);
@@ -1622,7 +1624,7 @@ static struct dir_ent *lookup_comp(char *comp, struct dir_info *dest)
 
 
 void eval_move(struct action_data *action_data, struct move_ent *move,
-		struct dir_info *root, struct dir_ent *dir_ent, char *pathname)
+	       struct dir_info *root, struct dir_ent *dir_ent, char *pathname)
 {
 	struct dir_info *dest, *source = dir_ent->our_dir;
 	struct dir_ent *comp_ent;
@@ -1644,7 +1646,7 @@ void eval_move(struct action_data *action_data, struct move_ent *move,
 		dest = source;
 
 	for(comp = get_comp(&pathname); comp; free(comp),
-						comp = get_comp(&pathname)) {
+			comp = get_comp(&pathname)) {
 
 		if (strcmp(comp, ".") == 0)
 			continue;
@@ -1665,7 +1667,7 @@ void eval_move(struct action_data *action_data, struct move_ent *move,
 		 */
 		comp_ent = lookup_comp(comp, dest);
 		if (comp_ent == NULL || (comp_ent->inode->buf.st_mode & S_IFMT)
-							!= S_IFDIR)
+				!= S_IFDIR)
 			break;
 
 		dest = comp_ent->dir;
@@ -1684,12 +1686,12 @@ void eval_move(struct action_data *action_data, struct move_ent *move,
 			 */
 			if (comp_ent == NULL)
 				ERROR("Move action: cannot move %s to %s, no "
-					"such directory %s\n",
-					action_data->subpath, path, comp);
+				      "such directory %s\n",
+				      action_data->subpath, path, comp);
 			else
 				ERROR("Move action: cannot move %s to %s, %s "
-					"is not a directory\n",
-					action_data->subpath, path, comp);
+				      "is not a directory\n",
+				      action_data->subpath, path, comp);
 			free(comp);
 			return;
 		}
@@ -1698,14 +1700,14 @@ void eval_move(struct action_data *action_data, struct move_ent *move,
 		 * Multiple move actions triggering on one file can be merged
 		 * if one is a RENAME and the other is a MOVE.  Multiple RENAMEs
 		 * can only merge if they're doing the same thing
-	 	 */
+		 */
 		if(move->ops & ACTION_MOVE_RENAME) {
 			if(strcmp(comp, move->name) != 0) {
 				char *conf_path = move_pathname(move);
 				ERROR("Move action: Cannot move %s to %s, "
-					"conflicting move, already moving "
-					"to %s via another move action!\n",
-					action_data->subpath, path, conf_path);
+				      "conflicting move, already moving "
+				      "to %s via another move action!\n",
+				      action_data->subpath, path, conf_path);
 				free(conf_path);
 				free(comp);
 				return;
@@ -1722,14 +1724,14 @@ void eval_move(struct action_data *action_data, struct move_ent *move,
 		 * Multiple move actions triggering on one file can be merged
 		 * if one is a RENAME and the other is a MOVE.  Multiple MOVEs
 		 * can only merge if they're doing the same thing
-	 	 */
+		 */
 		if(move->ops & ACTION_MOVE_MOVE) {
 			if(dest != move->dest) {
 				char *conf_path = move_pathname(move);
 				ERROR("Move action: Cannot move %s to %s, "
-					"conflicting move, already moving "
-					"to %s via another move action!\n",
-					action_data->subpath, path, conf_path);
+				      "conflicting move, already moving "
+				      "to %s via another move action!\n",
+				      action_data->subpath, path, conf_path);
 				free(conf_path);
 				return;
 			}
@@ -1747,10 +1749,10 @@ static int subdirectory(struct dir_info *source, struct dir_info *dest)
 		return 0;
 
 	return strlen(source->subpath) <= strlen(dest->subpath) &&
-		(dest->subpath[strlen(source->subpath)] == '/' ||
+	       (dest->subpath[strlen(source->subpath)] == '/' ||
 		dest->subpath[strlen(source->subpath)] == '\0') &&
-		strncmp(source->subpath, dest->subpath,
-		strlen(source->subpath)) == 0;
+	       strncmp(source->subpath, dest->subpath,
+		       strlen(source->subpath)) == 0;
 }
 
 
@@ -1791,7 +1793,7 @@ void eval_move_actions(struct dir_info *root, struct dir_ent *dir_ent)
 				move->dir_ent = dir_ent;
 			}
 			eval_move(&action_data, move, root, dir_ent,
-				action->argv[0]);
+				  action->argv[0]);
 		}
 	}
 
@@ -1810,15 +1812,15 @@ void eval_move_actions(struct dir_info *root, struct dir_ent *dir_ent)
 		}
 
 		dest = (move->ops & ACTION_MOVE_MOVE) ?
-			move->dest : dir_ent->our_dir;
+		       move->dest : dir_ent->our_dir;
 		name = (move->ops & ACTION_MOVE_RENAME) ?
-			move->name : dir_ent->name;
+		       move->name : dir_ent->name;
 		comp_ent = lookup_comp(name, dest);
 		if(comp_ent) {
 			char *conf_path = move_pathname(move);
 			ERROR("Move action: Cannot move %s to %s, "
-				"destination already exists\n",
-				action_data.subpath, conf_path);
+			      "destination already exists\n",
+			      action_data.subpath, conf_path);
 			free(conf_path);
 			free(move);
 			goto finish;
@@ -1831,8 +1833,8 @@ void eval_move_actions(struct dir_info *root, struct dir_ent *dir_ent)
 		if(subdirectory(dir_ent->dir, dest)) {
 			char *conf_path = move_pathname(move);
 			ERROR("Move action: Cannot move %s to %s, this is a "
-				"subdirectory of itself\n",
-				action_data.subpath, conf_path);
+			      "subdirectory of itself\n",
+			      action_data.subpath, conf_path);
 			free(conf_path);
 			free(move);
 			goto finish;
@@ -1870,7 +1872,7 @@ static void move_file(struct move_ent *move_ent)
 	if(move_ent->ops & ACTION_MOVE_MOVE) {
 		struct dir_ent *comp_ent, *prev = NULL;
 		struct dir_info *source = dir_ent->our_dir,
-							*dest = move_ent->dest;
+					 *dest = move_ent->dest;
 		char *filename = pathname(dir_ent);
 
 		/*
@@ -1880,8 +1882,8 @@ static void move_file(struct move_ent *move_ent)
 		if(subdirectory(dir_ent->dir, dest)) {
 			char *conf_path = move_pathname(move_ent);
 			ERROR("Move action: Cannot move %s to %s, this is a "
-				"subdirectory of itself\n",
-				subpathname(dir_ent), conf_path);
+			      "subdirectory of itself\n",
+			      subpathname(dir_ent), conf_path);
 			free(conf_path);
 			return;
 		}
@@ -1929,7 +1931,7 @@ static void move_file(struct move_ent *move_ent)
 		 * over-ridden
 		 */
 		if(dir_ent->nonstandard_pathname == NULL &&
-						dir_ent->source_name == NULL)
+				dir_ent->source_name == NULL)
 			dir_ent->source_name = dir_ent->name;
 		else
 			free(dir_ent->name);
@@ -1951,15 +1953,15 @@ void do_move_actions()
 	while(move_list) {
 		struct move_ent *temp = move_list;
 		struct dir_info *dest = (move_list->ops & ACTION_MOVE_MOVE) ?
-			move_list->dest : move_list->dir_ent->our_dir;
+					move_list->dest : move_list->dir_ent->our_dir;
 		char *name = (move_list->ops & ACTION_MOVE_RENAME) ?
-			move_list->name : move_list->dir_ent->name;
+			     move_list->name : move_list->dir_ent->name;
 		struct dir_ent *comp_ent = lookup_comp(name, dest);
 		if(comp_ent) {
 			char *conf_path = move_pathname(move_list);
 			ERROR("Move action: Cannot move %s to %s, "
-				"destination already exists\n",
-				subpathname(move_list->dir_ent), conf_path);
+			      "destination already exists\n",
+			      subpathname(move_list->dir_ent), conf_path);
 			free(conf_path);
 		} else
 			move_file(move_list);
@@ -2044,7 +2046,7 @@ static int parse_number(char *start, long long *size, int *range, char **error)
 	number = strtoll(start, &end, 10);
 
 	if((errno == ERANGE && (number == LLONG_MAX || number == LLONG_MIN))
-				|| (errno != 0 && number == 0)) {
+			|| (errno != 0 && number == 0)) {
 		/* long long underflow or overflow in conversion, or other
 		 * conversion error.
 		 * Note: we don't check for LLONG_MIN and LLONG_MAX only
@@ -2052,7 +2054,7 @@ static int parse_number(char *start, long long *size, int *range, char **error)
 		 * user used these values
 		 */
 		*error = "Long long underflow, overflow or other conversion "
-								"error";
+			 "error";
 		return 0;
 	}
 
@@ -2134,10 +2136,10 @@ static int parse_range_args(struct test_entry *test, struct atom *atom)
 
 	if (type != NUM_EQ) {
 		TEST_SYNTAX_ERROR(test, 0, "Range specifier (<, >, -, +) not "
-			"expected\n");
+				  "expected\n");
 		return 0;
 	}
- 
+
 	res = parse_number(atom->argv[1], &end, &type, &error);
 	if (res == 0) {
 		TEST_SYNTAX_ERROR(test, 1, "%s\n", error);
@@ -2146,10 +2148,10 @@ static int parse_range_args(struct test_entry *test, struct atom *atom)
 
 	if (type != NUM_EQ) {
 		TEST_SYNTAX_ERROR(test, 1, "Range specifier (<, >, -, +) not "
-			"expected\n");
+				  "expected\n");
 		return 0;
 	}
- 
+
 	range = malloc(sizeof(*range));
 	if (range == NULL)
 		MEM_ERROR();
@@ -2197,19 +2199,19 @@ static int NAME##_fn(struct atom *atom, struct action_data *action_data) \
 	} \
 	\
 	return match; \
-	})	
+	})
 
 
 /*
  * Generic test code macro testing VAR for range [x, y] (value between x and y
  * inclusive).
- */	
+ */
 #define TEST_VAR_RANGE_FN(NAME, MATCH, VAR) TEST_FN(NAME##_range, MATCH, \
 	{ \
 	struct test_range_args *range = atom->data; \
 	\
 	return range->start <= VAR && VAR <= range->end; \
-	})	
+	})
 
 
 /*
@@ -2239,11 +2241,11 @@ static int check_pathname(struct test_entry *test, struct atom *atom)
 
 TEST_FN(name, ACTION_ALL_LNK, \
 	return fnmatch(atom->argv[0], action_data->name,
-				FNM_PATHNAME|FNM_PERIOD|FNM_EXTMATCH) == 0;)
+		       FNM_PATHNAME|FNM_PERIOD|FNM_EXTMATCH) == 0;)
 
 TEST_FN(pathname, ACTION_ALL_LNK, \
 	return fnmatch(atom->argv[0], action_data->subpath,
-				FNM_PATHNAME|FNM_PERIOD|FNM_EXTMATCH) == 0;)
+		       FNM_PATHNAME|FNM_PERIOD|FNM_EXTMATCH) == 0;)
 
 
 static int count_components(char *path)
@@ -2280,13 +2282,13 @@ static char *get_start(char *s, int n)
 
 	return s;
 }
-	
+
 
 static int subpathname_fn(struct atom *atom, struct action_data *action_data)
 {
 	return fnmatch(atom->argv[0], get_start(strdupa(action_data->subpath),
-		count_components(atom->argv[0])),
-		FNM_PATHNAME|FNM_PERIOD|FNM_EXTMATCH) == 0;
+						count_components(atom->argv[0])),
+		       FNM_PATHNAME|FNM_PERIOD|FNM_EXTMATCH) == 0;
 }
 
 /*
@@ -2355,7 +2357,7 @@ static int parse_uid_arg(struct test_entry *test, struct atom *atom)
 		/* managed to fully parse argument as a number */
 		if(size < 0 || size > (((long long) 1 << 32) - 1)) {
 			TEST_SYNTAX_ERROR(test, 1, "Numeric uid out of "
-								"range\n");
+					  "range\n");
 			return 0;
 		}
 	} else {
@@ -2366,7 +2368,7 @@ static int parse_uid_arg(struct test_entry *test, struct atom *atom)
 			range = NUM_EQ;
 		} else {
 			TEST_SYNTAX_ERROR(test, 1, "Invalid uid or unknown "
-								"user\n");
+					  "user\n");
 			return 0;
 		}
 	}
@@ -2400,7 +2402,7 @@ static int parse_gid_arg(struct test_entry *test, struct atom *atom)
 		/* managed to fully parse argument as a number */
 		if(size < 0 || size > (((long long) 1 << 32) - 1)) {
 			TEST_SYNTAX_ERROR(test, 1, "Numeric gid out of "
-								"range\n");
+					  "range\n");
 			return 0;
 		}
 	} else {
@@ -2411,7 +2413,7 @@ static int parse_gid_arg(struct test_entry *test, struct atom *atom)
 			range = NUM_EQ;
 		} else {
 			TEST_SYNTAX_ERROR(test, 1, "Invalid gid or unknown "
-								"group\n");
+					  "group\n");
 			return 0;
 		}
 	}
@@ -2462,10 +2464,10 @@ static int parse_type_arg(struct test_entry *test, struct atom *atom)
 
 failed:
 	TEST_SYNTAX_ERROR(test, 0, "Unexpected file type, expected 'f', 'd', "
-		"'c', 'b', 'l', 's' or 'p'\n");
+			  "'c', 'b', 'l', 's' or 'p'\n");
 	return 0;
 }
-	
+
 
 static int type_fn(struct atom *atom, struct action_data *action_data)
 {
@@ -2511,7 +2513,7 @@ static int parse_file_arg(struct test_entry *test, struct atom *atom)
 		regerror(res, preg, str, 1024);
 		free(preg);
 		TEST_SYNTAX_ERROR(test, 0, "invalid regex \"%s\" because "
-			"\"%s\"\n", atom->argv[0], str);
+				  "\"%s\"\n", atom->argv[0], str);
 		return 0;
 	}
 
@@ -2547,13 +2549,13 @@ static int file_fn(struct atom *atom, struct action_data *action_data)
 			exit(EXIT_FAILURE);
 
 		execlp("file", "file", "-b", action_data->pathname,
-			(char *) NULL);
+		       (char *) NULL);
 		exit(EXIT_FAILURE);
 	}
 
 	/*
 	 * Parent process.  Read stdout from file command
- 	 */
+	 */
 	close(pipefd[1]);
 
 	do {
@@ -2578,7 +2580,7 @@ static int file_fn(struct atom *atom, struct action_data *action_data)
 
 	if (res == -1)
 		BAD_ERROR("file_fn waitpid failed\n");
- 
+
 	if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
 		BAD_ERROR("file_fn file returned error\n");
 
@@ -2647,14 +2649,14 @@ static int exec_fn(struct atom *atom, struct action_data *action_data)
 	}
 
 	/*
-	 * Parent process. 
- 	 */
+	 * Parent process.
+	 */
 
 	res = waitpid(child,  &status, 0);
 
 	if (res == -1)
 		BAD_ERROR("exec_fn waitpid failed\n");
- 
+
 	return WIFEXITED(status) ? WEXITSTATUS(status) == 0 : 0;
 }
 
@@ -2752,7 +2754,7 @@ static int exists_fn(struct atom *atom, struct action_data *action_data)
 	 *
 	 * This test function evaluates the path for symlinks - that is it
 	 * follows any symlinks in the path (and any symlinks that it contains
- 	 * etc.), to discover the fully dereferenced canonicalised relative
+	 * etc.), to discover the fully dereferenced canonicalised relative
 	 * path.
 	 *
 	 * If any symlinks within the path do not exist or are absolute
@@ -2767,7 +2769,7 @@ static int exists_fn(struct atom *atom, struct action_data *action_data)
 
 	/* dereference the symlink, and return TRUE if it exists */
 	return follow_path(action_data->dir_ent->our_dir,
-			action_data->dir_ent->inode->symlink) ? 1 : 0;
+			   action_data->dir_ent->inode->symlink) ? 1 : 0;
 }
 
 
@@ -2794,11 +2796,11 @@ static int absolute_fn(struct atom *atom, struct action_data *action_data)
 
 
 static int parse_expr_argX(struct test_entry *test, struct atom *atom,
-	int argno)
+			   int argno)
 {
 	/* Call parse_expr to parse argument, which should be an expression */
 
-	 /* save the current parser state */
+	/* save the current parser state */
 	char *save_cur_ptr = cur_ptr;
 	char *save_source = source;
 
@@ -2909,7 +2911,7 @@ static int readlink_fn(struct atom *atom, struct action_data *action_data)
 
 	/* dereference the symlink, and get the directory entry it points to */
 	dir_ent = follow_path(action_data->dir_ent->our_dir,
-			action_data->dir_ent->inode->symlink);
+			      action_data->dir_ent->inode->symlink);
 	if(dir_ent == NULL)
 		goto finish;
 
@@ -2987,14 +2989,14 @@ static int eval_fn(struct atom *atom, struct action_data *action_data)
 		 * will quite correctly refuse to execute ".." on anything
 		 * which isn't a directory */
 		if(strncmp(path, "..", 2) == 0 && (path[2] == '\0' ||
-							path[2] == '/')) {
+						   path[2] == '/')) {
 			/* walk from parent */
 			path += 2;
 			while(path[0] == '/')
 				path ++;
 			if(path[0] == '\0')
 				dir_ent = dir_ent->our_dir->dir_ent;
-			else 
+			else
 				dir_ent = follow_path(dir_ent->our_dir, path);
 		} else if(!file_type_match(buf->st_mode, ACTION_DIR))
 			dir_ent = NULL;
@@ -3094,7 +3096,7 @@ static int parse_perm_args(struct test_entry *test, struct atom *atom)
 	perm_data->mode = mode;
 
 	atom->data = perm_data;
-	
+
 finish:
 	while(head) {
 		struct mode_data *tmp = head;
@@ -3244,15 +3246,23 @@ static struct action_entry action_table[] = {
 	{ "fragment", FRAGMENT_ACTION, 1, ACTION_REG, NULL, NULL},
 	{ "exclude", EXCLUDE_ACTION, 0, ACTION_ALL_LNK, NULL, NULL},
 	{ "fragments", FRAGMENTS_ACTION, 0, ACTION_REG, NULL, frag_action},
-	{ "no-fragments", NO_FRAGMENTS_ACTION, 0, ACTION_REG, NULL,
-						no_frag_action},
-	{ "always-use-fragments", ALWAYS_FRAGS_ACTION, 0, ACTION_REG, NULL,
-						always_frag_action},
-	{ "dont-always-use-fragments", NO_ALWAYS_FRAGS_ACTION, 0, ACTION_REG,	
-						NULL, no_always_frag_action},
+	{
+		"no-fragments", NO_FRAGMENTS_ACTION, 0, ACTION_REG, NULL,
+		no_frag_action
+	},
+	{
+		"always-use-fragments", ALWAYS_FRAGS_ACTION, 0, ACTION_REG, NULL,
+		always_frag_action
+	},
+	{
+		"dont-always-use-fragments", NO_ALWAYS_FRAGS_ACTION, 0, ACTION_REG,
+		NULL, no_always_frag_action
+	},
 	{ "compressed", COMPRESSED_ACTION, 0, ACTION_REG, NULL, comp_action},
-	{ "uncompressed", UNCOMPRESSED_ACTION, 0, ACTION_REG, NULL,
-						uncomp_action},
+	{
+		"uncompressed", UNCOMPRESSED_ACTION, 0, ACTION_REG, NULL,
+		uncomp_action
+	},
 	{ "uid", UID_ACTION, 1, ACTION_ALL_LNK, parse_uid_args, uid_action},
 	{ "gid", GID_ACTION, 1, ACTION_ALL_LNK, parse_gid_args, gid_action},
 	{ "guid", GUID_ACTION, 2, ACTION_ALL_LNK, parse_guid_args, guid_action},

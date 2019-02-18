@@ -86,40 +86,40 @@ void dump_state()
 	dump_queue(to_deflate);
 
 	printf("uncompressed fragment queue (reader thread -> fragment"
-						" thread(s))\n");
+	       " thread(s))\n");
 	dump_queue(to_process_frag);
 
 	printf("processed fragment queue (fragment thread(s) -> main"
-						" thread)\n");
+	       " thread)\n");
 	dump_seq_queue(to_main, 1);
 
 	printf("compressed block queue (deflate thread(s) -> main thread)\n");
 	dump_seq_queue(to_main, 0);
 
 	printf("locked frag queue (compressed frags waiting while multi-block"
-						" file is written)\n");
+	       " file is written)\n");
 	dump_queue(locked_fragment);
 
 	printf("compressed block queue (main & fragment deflate threads(s) ->"
-						" writer thread)\n");
+	       " writer thread)\n");
 	dump_queue(to_writer);
 
 	printf("read cache (uncompressed blocks read by reader thread)\n");
 	dump_cache(reader_buffer);
 
 	printf("block write cache (compressed blocks waiting for the writer"
-						" thread)\n");
+	       " thread)\n");
 	dump_cache(bwriter_buffer);
 	printf("fragment write cache (compressed fragments waiting for the"
-						" writer thread)\n");
+	       " writer thread)\n");
 	dump_cache(fwriter_buffer);
 
 	printf("fragment cache (frags waiting to be compressed by fragment"
-						" deflate thread(s))\n");
+	       " deflate thread(s))\n");
 	dump_cache(fragment_buffer);
 
 	printf("fragment reserve cache (avoids pipeline stall if frag cache"
-						" full in dup check)\n");
+	       " full in dup check)\n");
 	dump_cache(reserve_cache);
 
 	enable_progress_bar();
@@ -147,14 +147,14 @@ void *info_thrd(void *arg)
 			case EAGAIN:
 				/* interval timed out */
 				waiting = 0;
-				/* FALLTHROUGH */
+			/* FALLTHROUGH */
 			case EINTR:
 				/* if waiting, the wait will be longer, but
 				   that's OK */
 				continue;
 			default:
 				BAD_ERROR("sigtimedwait/sigwaitinfo failed "
-					"because %s\n", strerror(errno));
+					  "because %s\n", strerror(errno));
 			}
 		}
 

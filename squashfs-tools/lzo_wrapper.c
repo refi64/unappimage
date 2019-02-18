@@ -37,7 +37,7 @@ static struct lzo_algorithm lzo[] = {
 	{ "lzo1x_1_12", LZO1X_1_12_MEM_COMPRESS, lzo1x_1_12_compress },
 	{ "lzo1x_1_15", LZO1X_1_15_MEM_COMPRESS, lzo1x_1_15_compress },
 	{ "lzo1x_999", LZO1X_999_MEM_COMPRESS, lzo1x_999_wrapper },
-	{ NULL, 0, NULL } 
+	{ NULL, 0, NULL }
 };
 
 /* default LZO compression algorithm and compression level */
@@ -178,7 +178,7 @@ static void *lzo_dump_options(int block_size, int *size)
 
 	comp_opts.algorithm = algorithm;
 	comp_opts.compression_level = algorithm == SQUASHFS_LZO1X_999 ?
-		compression_level : 0;
+				      compression_level : 0;
 
 	SQUASHFS_INSWAP_COMP_OPTS(&comp_opts);
 
@@ -247,8 +247,8 @@ static int lzo_extract_options(int block_size, void *buffer, int size)
 		break;
 	default:
 		fprintf(stderr, "lzo: bad algorithm in compression options "
-				"structure\n");
-			goto failed;
+			"structure\n");
+		goto failed;
 	}
 
 	algorithm = comp_opts->algorithm;
@@ -290,12 +290,12 @@ void lzo_display_options(void *buffer, int size)
 		}
 		printf("\talgorithm %s\n", lzo[comp_opts->algorithm].name);
 		printf("\tcompression level %d\n",
-						comp_opts->compression_level);
+		       comp_opts->compression_level);
 		break;
 	default:
 		fprintf(stderr, "lzo: bad algorithm in compression options "
-				"structure\n");
-			goto failed;
+			"structure\n");
+		goto failed;
 	}
 
 	return;
@@ -303,7 +303,7 @@ void lzo_display_options(void *buffer, int size)
 failed:
 	fprintf(stderr, "lzo: error reading stored compressor options from "
 		"filesystem!\n");
-}	
+}
 
 
 /*
@@ -338,16 +338,16 @@ failed:
 
 
 static int lzo_compress(void *strm, void *dest, void *src,  int size,
-	int block_size, int *error)
+			int block_size, int *error)
 {
 	int res;
 	lzo_uint compsize, orig_size = size;
 	struct lzo_stream *stream = strm;
 
 	res = lzo[algorithm].compress(src, size, stream->buffer, &compsize,
-							stream->workspace);
+				      stream->workspace);
 	if(res != LZO_E_OK)
-		goto failed;	
+		goto failed;
 
 	/* Successful compression, however, we need to check that
 	 * the compressed size is not larger than the available
@@ -376,7 +376,7 @@ failed:
 
 
 static int lzo_uncompress(void *dest, void *src, int size, int outsize,
-	int *error)
+			  int *error)
 {
 	int res;
 	lzo_uint outlen = outsize;
@@ -400,7 +400,7 @@ void lzo_usage()
 
 	for(i = 0; lzo[i].name; i++)
 		fprintf(stderr, "\t\t\t%s%s\n", lzo[i].name,
-				i == SQUASHFS_LZO1X_999 ? " (default)" : "");
+			i == SQUASHFS_LZO1X_999 ? " (default)" : "");
 
 	fprintf(stderr, "\t  -Xcompression-level <compression-level>\n");
 	fprintf(stderr, "\t\t<compression-level> should be 1 .. 9 (default "
@@ -416,10 +416,10 @@ void lzo_usage()
  * is applicable to it
  */
 int lzo1x_999_wrapper(const lzo_bytep src, lzo_uint src_len, lzo_bytep dst,
-	lzo_uintp compsize, lzo_voidp workspace)
+		      lzo_uintp compsize, lzo_voidp workspace)
 {
 	return lzo1x_999_compress_level(src, src_len, dst, compsize,
-		workspace, NULL, 0, 0, compression_level);
+					workspace, NULL, 0, 0, compression_level);
 }
 
 

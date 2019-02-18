@@ -59,7 +59,7 @@ void write_xattr(char *pathname, unsigned int xattr)
 
 		if(root_process || prefix == SQUASHFS_XATTR_USER) {
 			int res = lsetxattr(pathname, xattr_list[i].full_name,
-				xattr_list[i].value, xattr_list[i].vsize, 0);
+					    xattr_list[i].value, xattr_list[i].vsize, 0);
 
 			if(res == -1) {
 				if(errno == ENOTSUP) {
@@ -72,16 +72,16 @@ void write_xattr(char *pathname, unsigned int xattr)
 					 * is rather annoying
 					 */
 					ERROR("write_xattr: failed to write "
-						"xattr %s for file %s because " 
-						"extended attributes are not "
-						"supported by the destination "
-						"filesystem\n",
-						xattr_list[i].full_name,
-						pathname);
+					      "xattr %s for file %s because "
+					      "extended attributes are not "
+					      "supported by the destination "
+					      "filesystem\n",
+					      xattr_list[i].full_name,
+					      pathname);
 					ERROR("Ignoring xattrs in "
-								"filesystem\n");
+					      "filesystem\n");
 					ERROR("To avoid this error message, "
-						"specify -no-xattrs\n");
+					      "specify -no-xattrs\n");
 					ignore_xattrs = TRUE;
 				} else if((errno == ENOSPC || errno == EDQUOT)
 						&& nospace_error < NOSPACE_MAX) {
@@ -96,23 +96,23 @@ void write_xattr(char *pathname, unsigned int xattr)
 					 * then suppress the error messsage
 					 */
 					ERROR("write_xattr: failed to write "
-						"xattr %s for file %s because " 
-						"no extended attribute space "
-						"remaining (per file or "
-						"filesystem limit)\n",
-						xattr_list[i].full_name,
-						pathname);
+					      "xattr %s for file %s because "
+					      "no extended attribute space "
+					      "remaining (per file or "
+					      "filesystem limit)\n",
+					      xattr_list[i].full_name,
+					      pathname);
 					if(++ nospace_error == NOSPACE_MAX)
 						ERROR("%d of these errors "
-							"printed, further error "
-							"messages of this type "
-							"are suppressed!\n",
-							NOSPACE_MAX);
+						      "printed, further error "
+						      "messages of this type "
+						      "are suppressed!\n",
+						      NOSPACE_MAX);
 				} else
 					ERROR("write_xattr: failed to write "
-						"xattr %s for file %s because "
-						"%s\n", xattr_list[i].full_name,
-						pathname, strerror(errno));
+					      "xattr %s for file %s because "
+					      "%s\n", xattr_list[i].full_name,
+					      pathname, strerror(errno));
 			}
 		} else if(nonsuper_error == FALSE) {
 			/*
@@ -123,14 +123,14 @@ void write_xattr(char *pathname, unsigned int xattr)
 			 * same error message!
 			 */
 			ERROR("write_xattr: could not write xattr %s "
-					"for file %s because you're not "
-					"superuser!\n",
-					xattr_list[i].full_name, pathname);
+			      "for file %s because you're not "
+			      "superuser!\n",
+			      xattr_list[i].full_name, pathname);
 			ERROR("write_xattr: to avoid this error message, either"
-				" specify -user-xattrs, -no-xattrs, or run as "
-				"superuser!\n");
+			      " specify -user-xattrs, -no-xattrs, or run as "
+			      "superuser!\n");
 			ERROR("Further error messages of this type are "
-				"suppressed!\n");
+			      "suppressed!\n");
 			nonsuper_error = TRUE;
 		}
 	}

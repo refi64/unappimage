@@ -69,16 +69,16 @@ void swap_le64(void *src, void *dest)
 unsigned short inswap_le16(unsigned short num)
 {
 	return (num >> 8) |
-		((num & 0xff) << 8);
+	       ((num & 0xff) << 8);
 }
 
 
 unsigned int inswap_le32(unsigned int num)
 {
 	return (num >> 24) |
-		((num & 0xff0000) >> 8) |
-		((num & 0xff00) << 8) |
-		((num & 0xff) << 24);
+	       ((num & 0xff0000) >> 8) |
+	       ((num & 0xff00) << 8) |
+	       ((num & 0xff) << 24);
 }
 
 
@@ -87,13 +87,13 @@ long long inswap_le64(long long n)
 	unsigned long long num = n;
 
 	return (num >> 56) |
-		((num & 0xff000000000000LL) >> 40) |
-		((num & 0xff0000000000LL) >> 24) |
-		((num & 0xff00000000LL) >> 8) |
-		((num & 0xff000000) << 8) |
-		((num & 0xff0000) << 24) |
-		((num & 0xff00) << 40) |
-		((num & 0xff) << 56);
+	       ((num & 0xff000000000000LL) >> 40) |
+	       ((num & 0xff0000000000LL) >> 24) |
+	       ((num & 0xff00000000LL) >> 8) |
+	       ((num & 0xff000000) << 8) |
+	       ((num & 0xff0000) << 24) |
+	       ((num & 0xff00) << 40) |
+	       ((num & 0xff) << 56);
 }
 
 

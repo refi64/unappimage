@@ -17,7 +17,7 @@
  * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * lzma_options.c
- * 
+ *
  * Common options for LZMA1 and 2 compressors. Based on xz_wrapper.c
  */
 
@@ -53,17 +53,17 @@ struct lzma_xz_options *lzma_xz_get_options(void)
 int lzma_xz_options(char *argv[], int argc, int lzmaver)
 {
 	const char *comp_name = lzmaver_str[lzmaver];
-	
+
 	if(strcmp(argv[0], "-Xpreset") == 0) {
 		int preset;
-		
+
 		if(argc < 2) {
 			fprintf(stderr, "%s: -Xpreset missing preset\n", comp_name);
 			goto failed;
 		}
-		
+
 		preset = atoi(argv[1]);
-		
+
 		if (preset < 0 || preset > 9) {
 			fprintf(stderr, "%s: -Xpreset invalid value\n", comp_name);
 			goto failed;
@@ -75,14 +75,14 @@ int lzma_xz_options(char *argv[], int argc, int lzmaver)
 		return 0;
 	} else if(strcmp(argv[0], "-Xlc") == 0) {
 		int lc;
-		
+
 		if(argc < 2) {
 			fprintf(stderr, "%s: -Xlc missing lc\n", comp_name);
 			goto failed;
 		}
-		
+
 		lc = atoi(argv[1]);
-		
+
 		if (lc < LZMA_OPT_LC_MIN || lc > LZMA_OPT_LC_MAX) {
 			fprintf(stderr, "%s: -Xlc invalid value\n", comp_name);
 			goto failed;
@@ -91,14 +91,14 @@ int lzma_xz_options(char *argv[], int argc, int lzmaver)
 		return 1;
 	} else if(strcmp(argv[0], "-Xlp") == 0) {
 		int lp;
-		
+
 		if(argc < 2) {
 			fprintf(stderr, "%s: -Xlp missing lp\n", comp_name);
 			goto failed;
 		}
-		
+
 		lp = atoi(argv[1]);
-		
+
 		if (lp < LZMA_OPT_LP_MIN || lp > LZMA_OPT_LP_MAX) {
 			fprintf(stderr, "%s: -Xlp invalid value\n", comp_name);
 			goto failed;
@@ -107,30 +107,30 @@ int lzma_xz_options(char *argv[], int argc, int lzmaver)
 		return 1;
 	} else if(strcmp(argv[0], "-Xpb") == 0) {
 		int pb;
-		
+
 		if(argc < 2) {
 			fprintf(stderr, "%s: -Xpb missing pb\n", comp_name);
 			goto failed;
 		}
-		
+
 		pb = atoi(argv[1]);
-		
+
 		if (pb < LZMA_OPT_PB_MIN || pb > LZMA_OPT_PB_MAX) {
 			fprintf(stderr, "%s: -Xbp invalid value\n", comp_name);
 			goto failed;
 		}
 		options.pb = pb;
-		return 1;	
+		return 1;
 	} else if(strcmp(argv[0], "-Xfb") == 0) {
 		int fb;
-		
+
 		if(argc < 2) {
 			fprintf(stderr, "%s: -Xfb missing fb\n", comp_name);
 			goto failed;
 		}
-		
+
 		fb = atoi(argv[1]);
-		
+
 		if (fb < LZMA_OPT_FB_MIN || fb > LZMA_OPT_FB_MAX) {
 			fprintf(stderr, "%s: -Xfb invalid value\n", comp_name);
 			goto failed;
@@ -180,9 +180,9 @@ int lzma_xz_options(char *argv[], int argc, int lzmaver)
 
 		return 1;
 	}
-	
+
 	return -1;
-	
+
 failed:
 	return -2;
 
@@ -202,7 +202,7 @@ int lzma_xz_options_post(int block_size, int lzmaver)
 		if(options.dict_size) {
 			if(options.dict_size > block_size) {
 				fprintf(stderr, "%s: -Xdict-size is larger than"
-				" block_size\n", comp_name);
+					" block_size\n", comp_name);
 				goto failed;
 			}
 		} else
@@ -217,7 +217,7 @@ int lzma_xz_options_post(int block_size, int lzmaver)
 		/*
 		 * dictionary_size must be storable in xz header as either
 		 * 2^n or as  2^n+2^(n+1)
-	 	*/
+		*/
 		n = ffs(options.dict_size) - 1;
 		if(options.dict_size != (1 << n) &&
 				options.dict_size != ((1 << n) + (1 << (n + 1)))) {
@@ -255,25 +255,25 @@ void *lzma_xz_dump_options(int block_size, int *size, int flags)
 			options.dict_size == block_size &&
 			flags == 0)
 		return NULL;
-	
+
 	*size = sizeof(struct lzma_opts);
 
 	lzma_comp_opts.flags |= flags;
-	
+
 	if (options.extreme)
 		lzma_comp_opts.flags |= LZMA_OPT_EXTREME;
-	
+
 	lzma_comp_opts.flags |= ((options.preset << LZMA_OPT_PRE_OFF) & LZMA_OPT_PRE_MASK);
-	
-	lzma_comp_opts.bit_opts = 
-			((options.lc << LZMA_OPT_LC_OFF) & LZMA_OPT_LC_MASK) |
-			((options.lp << LZMA_OPT_LP_OFF) & LZMA_OPT_LP_MASK) |
-			((options.pb << LZMA_OPT_PB_OFF) & LZMA_OPT_PB_MASK);
+
+	lzma_comp_opts.bit_opts =
+		((options.lc << LZMA_OPT_LC_OFF) & LZMA_OPT_LC_MASK) |
+		((options.lp << LZMA_OPT_LP_OFF) & LZMA_OPT_LP_MASK) |
+		((options.pb << LZMA_OPT_PB_OFF) & LZMA_OPT_PB_MASK);
 	lzma_comp_opts.fb = options.fb;
 	lzma_comp_opts.dict_size = options.dict_size;
-	
+
 	SQUASHFS_INSWAP_LZMA_COMP_OPTS(&lzma_comp_opts);
-	
+
 	return &lzma_comp_opts;
 }
 
@@ -292,12 +292,12 @@ int lzma_xz_extract_options(int block_size, void *buffer, int size, int lzmaver)
 	} else {
 		struct lzma_opts *comp_opts = buffer;
 		int n;
-		
+
 		if (size != sizeof(struct lzma_opts))
 			goto failed;
-		
+
 		SQUASHFS_INSWAP_LZMA_COMP_OPTS(comp_opts);
-		
+
 		options.flags = comp_opts->flags & LZMA_OPT_FLT_MASK;
 		options.preset  = (comp_opts->flags & LZMA_OPT_PRE_MASK) >> LZMA_OPT_PRE_OFF;
 		options.extreme = !!(comp_opts->flags & LZMA_OPT_EXTREME);
@@ -307,12 +307,12 @@ int lzma_xz_extract_options(int block_size, void *buffer, int size, int lzmaver)
 		options.pb = (comp_opts->bit_opts & LZMA_OPT_PB_MASK) >> LZMA_OPT_PB_OFF;
 		options.fb = comp_opts->fb;
 		options.dict_size = comp_opts->dict_size;
-		
+
 		/* check that the LZMA bit options are in range */
 		if (options.lc < LZMA_OPT_LC_MIN || options.lc > LZMA_OPT_LC_MAX ||
-			options.lp < LZMA_OPT_LP_MIN || options.lp > LZMA_OPT_LP_MAX ||
-			options.pb < LZMA_OPT_PB_MIN || options.pb > LZMA_OPT_PB_MAX ||
-			options.fb < LZMA_OPT_FB_MIN || options.fb > LZMA_OPT_FB_MAX)
+				options.lp < LZMA_OPT_LP_MIN || options.lp > LZMA_OPT_LP_MAX ||
+				options.pb < LZMA_OPT_PB_MIN || options.pb > LZMA_OPT_PB_MAX ||
+				options.fb < LZMA_OPT_FB_MIN || options.fb > LZMA_OPT_FB_MAX)
 			goto failed;
 
 		/*
@@ -323,15 +323,15 @@ int lzma_xz_extract_options(int block_size, void *buffer, int size, int lzmaver)
 		if(options.dict_size != (1 << n) &&
 				options.dict_size != ((1 << n) + (1 << (n + 1))))
 			goto failed;
-		
+
 	}
-	
+
 	return 0;
 
 failed:
 	fprintf(stderr, "%s: error reading stored compressor options from "
 		"filesystem!\n", lzmaver_str[lzmaver]);
-	return -1;	
+	return -1;
 }
 
 void lzma_xz_usage(int lzmaver)
@@ -351,15 +351,15 @@ void lzma_xz_usage(int lzmaver)
 	fprintf(stderr, "\t\tNice length of a match (5-273, default 64)\n");
 	fprintf(stderr, "\t  -Xdict-size <dict-size>\n");
 	fprintf(stderr, "\t\tUse <dict-size> as the %s dictionary size.  The",
-			lzmaver == LZMA_OPT_LZMA ? "LZMA" : "XZ");
+		lzmaver == LZMA_OPT_LZMA ? "LZMA" : "XZ");
 	fprintf(stderr, " dictionary size\n\t\tcan be specified as a");
 	fprintf(stderr, " percentage of the block size, or as an\n\t\t");
 	fprintf(stderr, "absolute value.  The dictionary size must be less");
-	fprintf(stderr, " than or equal\n\t\tto the block size and %d bytes", 
-			lzmaver == LZMA_OPT_LZMA ? 4096 : 8192);
+	fprintf(stderr, " than or equal\n\t\tto the block size and %d bytes",
+		lzmaver == LZMA_OPT_LZMA ? 4096 : 8192);
 	fprintf(stderr, " or larger.  It must also be\n\t\tstorable in the lzma");
 	fprintf(stderr, " header as either 2^n or as 2^n+2^(n+1).\n\t\t");
 	fprintf(stderr, "Example dict-sizes are 75%%, 50%%, 37.5%%, 25%%, or");
 	fprintf(stderr, " 32K, 16K, 8K\n\t\tetc.\n");
-	
+
 }

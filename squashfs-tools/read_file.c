@@ -39,7 +39,7 @@
  * parsing.
  *
  * Lines can be split across multiple lines using "\".
- * 
+ *
  * Blank lines and comment lines indicated by # are supported.
  */
 int read_file(char *filename, char *type, int (parse_line)(char *))
@@ -51,7 +51,7 @@ int read_file(char *filename, char *type, int (parse_line)(char *))
 	fd = fopen(filename, "r");
 	if(fd == NULL) {
 		ERROR("Could not open %s device file \"%s\" because %s\n",
-			type, filename, strerror(errno));
+		      type, filename, strerror(errno));
 		return FALSE;
 	}
 
@@ -77,8 +77,8 @@ int read_file(char *filename, char *type, int (parse_line)(char *))
 			if(len == MAX_LINE && line[total - 1] != '\n') {
 				/* line too large */
 				ERROR("Line too long when reading "
-					"%s file \"%s\", larger than "
-					"%d bytes\n", type, filename, MAX_LINE);
+				      "%s file \"%s\", larger than "
+				      "%d bytes\n", type, filename, MAX_LINE);
 				goto failed;
 			}
 
@@ -102,13 +102,13 @@ int read_file(char *filename, char *type, int (parse_line)(char *))
 				break;
 			else
 				total --;
-		}	
+		}
 
 		if(err == NULL) {
 			if(ferror(fd)) {
-                		ERROR("Reading %s file \"%s\" failed "
-					"because %s\n", type, filename,
-					strerror(errno));
+				ERROR("Reading %s file \"%s\" failed "
+				      "because %s\n", type, filename,
+				      strerror(errno));
 				goto failed;
 			}
 

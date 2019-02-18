@@ -103,7 +103,7 @@ static int gzip_options(char *argv[], int argc)
 
 		if(argc < 2) {
 			fprintf(stderr, "gzip: -Xstrategy missing "
-							"strategies\n");
+				"strategies\n");
 			goto failed;
 		}
 
@@ -115,7 +115,7 @@ static int gzip_options(char *argv[], int argc)
 						(name[n] == '\0' ||
 						 name[n] == ',')) {
 					if(strategy[i].selected == 0) {
-				 		strategy[i].selected = 1;
+						strategy[i].selected = 1;
 						strategy_count++;
 					}
 					name += name[n] == ',' ? n + 1 : n;
@@ -128,7 +128,7 @@ static int gzip_options(char *argv[], int argc)
 				goto failed;
 			}
 		}
-	
+
 		return 1;
 	}
 
@@ -183,8 +183,8 @@ static void *gzip_dump_options(int block_size, int *size)
 	 * with the legacy implementation of GZIP for Squashfs)
 	 */
 	if(compression_level == GZIP_DEFAULT_COMPRESSION_LEVEL &&
-				window_size == GZIP_DEFAULT_WINDOW_SIZE &&
-				strategy_count == 0)
+			window_size == GZIP_DEFAULT_WINDOW_SIZE &&
+			strategy_count == 0)
 		return NULL;
 
 	for(i = 0; strategy[i].name; i++)
@@ -265,7 +265,7 @@ static int gzip_extract_options(int block_size, void *buffer, int size)
 		} else
 			strategy[i].selected = 0;
 	}
-	
+
 	return 0;
 
 failed:
@@ -325,7 +325,7 @@ void gzip_display_options(void *buffer, int size)
 failed:
 	fprintf(stderr, "gzip: error reading stored compressor options from "
 		"filesystem!\n");
-}	
+}
 
 
 /*
@@ -349,12 +349,12 @@ static int gzip_init(void **strm, int block_size, int datablock)
 		stream->strategy[0].strategy = Z_DEFAULT_STRATEGY;
 	} else {
 		stream = malloc(sizeof(*stream) +
-			sizeof(struct gzip_strategy) * strategy_count);
+				sizeof(struct gzip_strategy) * strategy_count);
 		if(stream == NULL)
 			goto failed;
 
 		memset(stream->strategy, 0, sizeof(struct gzip_strategy) *
-			strategy_count);
+		       strategy_count);
 
 		stream->strategies = strategy_count;
 
@@ -371,13 +371,13 @@ static int gzip_init(void **strm, int block_size, int datablock)
 			j++;
 		}
 	}
-		
+
 	stream->stream.zalloc = Z_NULL;
 	stream->stream.zfree = Z_NULL;
 	stream->stream.opaque = 0;
 
 	res = deflateInit2(&stream->stream, compression_level, Z_DEFLATED,
-		window_size, 8, stream->strategy[0].strategy);
+			   window_size, 8, stream->strategy[0].strategy);
 	if(res != Z_OK)
 		goto failed2;
 
@@ -394,7 +394,7 @@ failed:
 
 
 static int gzip_compress(void *strm, void *d, void *s, int size, int block_size,
-		int *error)
+			 int *error)
 {
 	int i, res;
 	struct gzip_stream *stream = strm;
@@ -416,7 +416,7 @@ static int gzip_compress(void *strm, void *d, void *s, int size, int block_size,
 
 		if(stream->strategies > 1) {
 			res = deflateParams(&stream->stream,
-				compression_level, strategy->strategy);
+					    compression_level, strategy->strategy);
 			if(res != Z_OK)
 				goto failed;
 		}

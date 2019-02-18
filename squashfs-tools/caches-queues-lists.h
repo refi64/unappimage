@@ -193,7 +193,7 @@ extern void cache_block_put(struct file_buffer *);
 extern void dump_cache(struct cache *);
 extern struct file_buffer *cache_get_nowait(struct cache *, long long);
 extern struct file_buffer *cache_lookup_nowait(struct cache *, long long,
-	char *);
+		char *);
 extern void cache_wait_unlock(struct file_buffer *);
 extern void cache_unlock(struct file_buffer *);
 

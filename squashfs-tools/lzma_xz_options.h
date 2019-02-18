@@ -41,7 +41,7 @@ struct lzma_opts {
 #define LZMA_OPT_FLT_MASK	0xffff
 #define LZMA_OPT_PRE_OFF	16
 #define LZMA_OPT_PRE_MASK	(0xf << LZMA_OPT_PRE_OFF)
-#define LZMA_OPT_EXTREME	20	
+#define LZMA_OPT_EXTREME	20
 	uint16_t bit_opts;
 #define LZMA_OPT_LC_OFF		0
 #define LZMA_OPT_LC_MASK	(0x7 << LZMA_OPT_LC_OFF)
