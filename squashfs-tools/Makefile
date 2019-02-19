@@ -256,7 +256,7 @@ all: mksquashfs unsquashfs
 mksquashfs: $(MKSQUASHFS_OBJS)
 	$(CC) $(LDFLAGS) $(EXTRA_LDFLAGS) $(MKSQUASHFS_OBJS) $(LIBS) -o $@
 
-mksquashfs.o: Makefile mksquashfs.c squashfs_fs.h squashfs_swap.h mksquashfs.h \
+mksquashfs.o: Makefile version mksquashfs.c squashfs_fs.h squashfs_swap.h mksquashfs.h \
 	sort.h pseudo.h compressor.h xattr.h action.h error.h progressbar.h \
 	info.h caches-queues-lists.h read_fs.h restore.h process_fragments.h \
 	version.h
@@ -305,14 +305,17 @@ lz4_wrapper.o: lz4_wrapper.c squashfs_fs.h lz4_wrapper.h compressor.h
 
 xz_wrapper.o: xz_wrapper.c squashfs_fs.h xz_wrapper.h compressor.h
 
-version.h: version.sh
+# use target version to always call version.h
+.PHONY: version
+version.h: version
+version:
 	./version.sh
 
-unsquashfs: $(UNSQUASHFS_OBJS)
+unsquashfs: version $(UNSQUASHFS_OBJS)
 	$(CC) $(LDFLAGS) $(EXTRA_LDFLAGS) $(UNSQUASHFS_OBJS) $(LIBS) -o $@
 
 unsquashfs.o: unsquashfs.h unsquashfs.c squashfs_fs.h squashfs_swap.h \
-	squashfs_compat.h xattr.h read_fs.h compressor.h
+	squashfs_compat.h xattr.h read_fs.h compressor.h version.h
 
 unsquash-1.o: unsquashfs.h unsquash-1.c squashfs_fs.h squashfs_compat.h
 
