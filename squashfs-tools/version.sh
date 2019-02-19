@@ -47,7 +47,7 @@ try_version() {
 try_git() {
 	[ -d .git ] || return 1
 
-	REV="$(git describe --tags 2>/dev/null)"
+	REV="$(git describe --tags --always --dirty 2>/dev/null)"
 	SOURCE_DATE_EPOCH="$(git log -1 --format=format:%ct)"
 
         [ -n "$REV" ] && [ -n "$SOURCE_DATE_EPOCH" ]
