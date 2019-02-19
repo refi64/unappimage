@@ -70,7 +70,7 @@ char *file_data;
 char *data;
 unsigned int block_size;
 unsigned int block_log;
-int lsonly = FALSE, info = FALSE, force = FALSE, short_ls = TRUE;
+int lsonly = FALSE, info = FALSE, force = FALSE, short_ls = TRUE, numeric_ls = FALSE;
 int use_regex = FALSE;
 char **created_inode;
 int root_process;
@@ -525,8 +525,8 @@ int print_filename(char *pathname, struct inode *inode)
 	char str[11], dummy[12], dummy2[12]; /* overflow safe */
 	char *userstr, *groupstr;
 	int padchars;
-	struct passwd *user;
-	struct group *group;
+	struct passwd *user = NULL;
+	struct group *group = NULL;
 	struct tm *t;
 
 	if(short_ls) {
@@ -534,8 +534,9 @@ int print_filename(char *pathname, struct inode *inode)
 		return 1;
 	}
 
-	user = getpwuid(inode->uid);
-	if(user == NULL) {
+	if(!numeric_ls)
+		user = getpwuid(inode->uid);
+	if(user == NULL || numeric_ls) {
 		int res = snprintf(dummy, 12, "%d", inode->uid);
 		if(res < 0)
 			EXIT_UNSQUASH("snprintf failed in print_filename()\n");
@@ -548,8 +549,9 @@ int print_filename(char *pathname, struct inode *inode)
 	} else
 		userstr = user->pw_name;
 
-	group = getgrgid(inode->gid);
-	if(group == NULL) {
+	if(!numeric_ls)
+		group = getgrgid(inode->gid);
+	if(group == NULL || numeric_ls) {
 		int res = snprintf(dummy2, 12, "%d", inode->gid);
 		if(res < 0)
 			EXIT_UNSQUASH("snprintf failed in print_filename()\n");
@@ -2658,6 +2660,11 @@ int main(int argc, char *argv[])
 				strcmp(argv[i], "-ll") == 0) {
 			lsonly = TRUE;
 			short_ls = FALSE;
+		} else if(strcmp(argv[i], "-nls") == 0 ||
+				strcmp(argv[i], "-nl") == 0) {
+			lsonly = TRUE;
+			short_ls = FALSE;
+			numeric_ls = TRUE;
 		} else if(strcmp(argv[i], "-linfo") == 0 ||
 				strcmp(argv[i], "-li") == 0) {
 			info = TRUE;
@@ -2722,6 +2729,9 @@ options:
 			ERROR("\t-ll[s]\t\t\tlist filesystem with file "
 			      "attributes (like\n");
 			ERROR("\t\t\t\tls -l output), but don't unsquash\n");
+			ERROR("\t-nl[s]\t\t\tlist filesystem with file "
+				"attributes (like\n");
+			ERROR("\t\t\t\tls -n output), but don't unsquash\n");
 			ERROR("\t-f[orce]\t\tif file already exists then "
 			      "overwrite\n");
 			ERROR("\t-s[tat]\t\t\tdisplay filesystem superblock "
