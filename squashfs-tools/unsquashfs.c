@@ -2519,8 +2519,8 @@ int parse_number(char *arg, int *res)
 
 #define VERSION() \
 	printf("unsquashfs version %s (%s)\n", VERSION_STR, VERSION_DATE_STR);\
-	printf("copyright (C) 2014 Phillip Lougher "\
-		"<phillip@squashfs.org.uk>\n\n");\
+	printf("squashfskit version %s (%s)\n", VERSION_STR, VERSION_DATE_STR);\
+	printf("\nhttps://github.com/squashfskit/squashfskit/\n\n");\
     	printf("This program is free software; you can redistribute it and/or"\
 		"\n");\
 	printf("modify it under the terms of the GNU General Public License"\
