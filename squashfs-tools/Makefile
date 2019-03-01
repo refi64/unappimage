@@ -319,7 +319,6 @@ clean:
 	-rm -f *.o mksquashfs unsquashfs
 
 .PHONY: install
-install: mksquashfs unsquashfs
+install: unappimage
 	mkdir -p $(INSTALL_DIR)
-	cp mksquashfs $(INSTALL_DIR)
-	cp unsquashfs $(INSTALL_DIR)
+	cp unappimage $(INSTALL_DIR)
