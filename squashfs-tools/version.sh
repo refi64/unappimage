@@ -64,5 +64,5 @@ EOF
 
 cd "$TOP"
 try_git || try_version || REV="unknown"
-[ -z "$SOURCE_DATE_EPOCH" ] && SOURCE_DATE_EPOCH="$(date %s)"
+[ -z "$SOURCE_DATE_EPOCH" ] && SOURCE_DATE_EPOCH="$(date +%s)"
 output_version
