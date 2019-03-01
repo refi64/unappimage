@@ -32,7 +32,11 @@
 #include "stdarg.h"
 #include "fnmatch_compat.h"
 
+#include <libelf.h>
+#include <gelf.h>
+
 #include <sys/sysinfo.h>
+#include <sys/sysmacros.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -162,7 +166,7 @@ int shift_overflow(int a, int shift)
 	return (INT_MAX >> shift) < a;
 }
 
- 
+
 int multiply_overflow(int a, int multiplier)
 {
 	return (INT_MAX / multiplier) < a;
@@ -231,7 +235,7 @@ void dump_queue(struct queue *queue)
 {
 	pthread_mutex_lock(&queue->mutex);
 
-	printf("Max size %d, size %d%s\n", queue->size - 1,  
+	printf("Max size %d, size %d%s\n", queue->size - 1,
 		queue->readp <= queue->writep ? queue->writep - queue->readp :
 			queue->size - queue->readp + queue->writep,
 		queue->readp == queue->writep ? " (EMPTY)" :
@@ -414,13 +418,13 @@ struct cache_entry *cache_get(struct cache *cache, long long block, int size)
 	return entry;
 }
 
-	
+
 void cache_block_ready(struct cache_entry *entry, int error)
 {
 	/*
 	 * mark cache entry as being complete, reading and (if necessary)
  	 * decompression has taken place, and the buffer is valid for use.
- 	 * If an error occurs reading or decompressing, the buffer also 
+ 	 * If an error occurs reading or decompressing, the buffer also
  	 * becomes ready but with an error...
  	 */
 	pthread_mutex_lock(&entry->cache->mutex);
@@ -542,7 +546,7 @@ int print_filename(char *pathname, struct inode *inode)
 			userstr = dummy;
 	} else
 		userstr = user->pw_name;
-		 
+
 	group = getgrgid(inode->gid);
 	if(group == NULL) {
 		int res = snprintf(dummy2, 12, "%d", inode->gid);
@@ -574,7 +578,7 @@ int print_filename(char *pathname, struct inode *inode)
 		case S_IFCHR:
 		case S_IFBLK:
 			padchars = TOTALCHARS - strlen(userstr) -
-				strlen(groupstr) - 7; 
+				strlen(groupstr) - 7;
 
 			printf("%*s%3d,%3d ", padchars > 0 ? padchars : 0, " ",
 				(int) inode->data >> 8, (int) inode->data &
@@ -589,10 +593,10 @@ int print_filename(char *pathname, struct inode *inode)
 	if((inode->mode & S_IFMT) == S_IFLNK)
 		printf(" -> %s", inode->symlink);
 	printf("\n");
-		
+
 	return 1;
 }
-	
+
 
 void add_entry(struct hash_table_entry *hash_table[], long long start,
 	int bytes)
@@ -665,12 +669,12 @@ int read_block(int fd, long long start, long long *next, int expected,
 	unsigned short c_byte;
 	int offset = 2, res, compressed;
 	int outlen = expected ? expected : SQUASHFS_METADATA_SIZE;
-	
+
 	if(swap) {
 		if(read_fs_bytes(fd, start, 2, &c_byte) == FALSE)
 			goto failed;
 		c_byte = (c_byte >> 8) | ((c_byte & 0xff) << 8);
-	} else 
+	} else
 		if(read_fs_bytes(fd, start, 2, &c_byte) == FALSE)
 			goto failed;
 
@@ -808,7 +812,7 @@ int read_inode_table(long long start, long long end)
 			ERROR("read_inode_table: metadata block should be %d "
 				"bytes in length, it is %d bytes\n",
 				SQUASHFS_METADATA_SIZE, res);
-			
+
 			goto failed;
 		}
 	}
@@ -1112,7 +1116,7 @@ int create_inode(char *pathname, struct inode *i)
 			}
 
 			write_xattr(pathname, i->xattr);
-	
+
 			if(root_process) {
 				if(lchown(pathname, i->uid, i->gid) == -1)
 					ERROR("create_inode: failed to change "
@@ -1335,7 +1339,7 @@ struct pathname *add_path(struct pathname *paths, char *target, char *alltarget)
 		paths->name = realloc(paths->name, (i + 1) *
 			sizeof(struct path_entry));
 		if(paths->name == NULL)
-			EXIT_UNSQUASH("Out of memory in add_path\n");	
+			EXIT_UNSQUASH("Out of memory in add_path\n");
 		paths->name[i].name = targname;
 		paths->name[i].paths = NULL;
 		if(use_regex) {
@@ -1581,7 +1585,7 @@ void dir_scan(char *parent_name, unsigned int start_block, unsigned int offset,
 				squashfs_closedir(dir);
 				FAILED = TRUE;
 				return;
-			} 
+			}
 
 			/*
 			 * Try to change permissions of existing directory so
@@ -1796,6 +1800,37 @@ int check_compression(struct compressor *comp)
 }
 
 
+int skip_elf(char *source)
+{
+	Elf *e;
+	GElf_Ehdr hdr;
+
+	if (elf_version(EV_CURRENT) == EV_NONE) {
+		ERROR("libelf version is too old.\n");
+		return FALSE;
+	}
+
+	e = elf_begin(fd, ELF_C_READ, NULL);
+	if (e == NULL) {
+		ERROR("Failed to open elf file because %s\n", elf_errmsg(elf_errno()));
+		return FALSE;
+	}
+
+	if (elf_kind(e) != ELF_K_ELF) {
+		ERROR("Invalid elf kind\n");
+		return FALSE;
+	}
+
+	if (gelf_getehdr(e, &hdr) == NULL) {
+		ERROR("Failed to retrieve elf header because %s\n", elf_errmsg(elf_errno()));
+		return FALSE;
+	}
+
+	squashfs_start_offset = hdr.e_shoff + (hdr.e_shnum * hdr.e_shentsize);
+	return TRUE;
+}
+
+
 int read_super(char *source)
 {
 	squashfs_super_block_3 sBlk_3;
@@ -1880,7 +1915,7 @@ int read_super(char *source)
 		sBlk.guid_start = sBlk_3.guid_start_2;
 		sBlk.s.inode_table_start = sBlk_3.inode_table_start_2;
 		sBlk.s.directory_table_start = sBlk_3.directory_table_start_2;
-		
+
 		if(sBlk.s.s_major == 1) {
 			sBlk.s.block_size = sBlk_3.block_size_1;
 			sBlk.s.fragment_table_start = sBlk.uid_start;
@@ -1979,7 +2014,7 @@ struct pathname *process_extract_files(struct pathname *path, char *filename)
 	fclose(fd);
 	return path;
 }
-		
+
 
 /*
  * reader thread.  This thread processes read requests queued by the
@@ -2139,7 +2174,7 @@ void *inflator(void *arg)
 		 * block has been either successfully decompressed, or an error
  		 * occurred, clear pending flag, set error appropriately and
  		 * wake up any threads waiting on this block
- 		 */ 
+ 		 */
 		cache_block_ready(entry, res == -1);
 	}
 }
@@ -2532,7 +2567,7 @@ int main(int argc, char *argv[])
 	root_process = geteuid() == 0;
 	if(root_process)
 		umask(0);
-	
+
 	for(i = 1; i < argc; i++) {
 		if(*argv[i] != '-')
 			break;
@@ -2567,17 +2602,9 @@ int main(int argc, char *argv[])
 				exit(1);
 			}
 			dest = argv[i];
-        		} else if (strcmp(argv[i], "-offset") == 0 ||
-				strcmp(argv[i], "-o") == 0) {
-			if(++i == argc) {
-				fprintf(stderr, "%s: -offset missing argument\n",
-					argv[0]);
-				exit(1);
-			}
-			squashfs_start_offset = (off_t)atol(argv[i]);
 		} else if(strcmp(argv[i], "-processors") == 0 ||
 				strcmp(argv[i], "-p") == 0) {
-			if((++i == argc) || 
+			if((++i == argc) ||
 					!parse_number(argv[i],
 						&processors)) {
 				ERROR("%s: -processors missing or invalid "
@@ -2667,8 +2694,6 @@ options:
 				"copyright information\n");
 			ERROR("\t-d[est] <pathname>\tunsquash to <pathname>, "
 				"default \"squashfs-root\"\n");
-			ERROR("\t-o[ffset] <bytes>\tskip <bytes> at start of input file, "
-				"default \"0\"\n");
 			ERROR("\t-n[o-progress]\t\tdon't display the progress "
 				"bar\n");
 			ERROR("\t-no[-xattrs]\t\tdon't extract xattrs in file system"
@@ -2721,6 +2746,9 @@ options:
 			strerror(errno));
 		exit(1);
 	}
+
+	if(skip_elf(argv[i]) == FALSE)
+		exit(1);
 
 	if(read_super(argv[i]) == FALSE)
 		exit(1);

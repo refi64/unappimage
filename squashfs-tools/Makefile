@@ -134,7 +134,7 @@ CFLAGS += $(EXTRA_CFLAGS) $(INCLUDEDIR) -D_FILE_OFFSET_BITS=64 \
 	-D_LARGEFILE_SOURCE -D_GNU_SOURCE -DCOMP_DEFAULT=\"$(COMP_DEFAULT)\" \
 	-Wall
 
-LIBS = -lpthread -lm
+LIBS = -lelf -lpthread -lm
 ifeq ($(GZIP_SUPPORT),1)
 CFLAGS += -DGZIP_SUPPORT
 MKSQUASHFS_OBJS += gzip_wrapper.o
@@ -242,14 +242,14 @@ $(error "COMP_DEFAULT is set to ${COMP_DEFAULT}, which  isn't selected to be \
 endif
 
 .PHONY: all
-all: mksquashfs unsquashfs
+all: unappimage
 
 mksquashfs: $(MKSQUASHFS_OBJS)
 	$(CC) $(LDFLAGS) $(EXTRA_LDFLAGS) $(MKSQUASHFS_OBJS) $(LIBS) -o $@
 
 mksquashfs.o: Makefile mksquashfs.c squashfs_fs.h squashfs_swap.h mksquashfs.h \
 	sort.h pseudo.h compressor.h xattr.h action.h error.h progressbar.h \
-	info.h caches-queues-lists.h read_fs.h restore.h process_fragments.h 
+	info.h caches-queues-lists.h read_fs.h restore.h process_fragments.h
 
 read_fs.o: read_fs.c squashfs_fs.h squashfs_swap.h compressor.h xattr.h \
 	error.h mksquashfs.h
@@ -295,7 +295,7 @@ lz4_wrapper.o: lz4_wrapper.c squashfs_fs.h lz4_wrapper.h compressor.h
 
 xz_wrapper.o: xz_wrapper.c squashfs_fs.h xz_wrapper.h compressor.h
 
-unsquashfs: $(UNSQUASHFS_OBJS)
+unappimage: $(UNSQUASHFS_OBJS)
 	$(CC) $(LDFLAGS) $(EXTRA_LDFLAGS) $(UNSQUASHFS_OBJS) $(LIBS) -o $@
 
 unsquashfs.o: unsquashfs.h unsquashfs.c squashfs_fs.h squashfs_swap.h \
