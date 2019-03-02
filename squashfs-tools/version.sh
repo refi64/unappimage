@@ -35,11 +35,11 @@ our_date() {
 }
 
 try_version() {
-        [ -f version ] && [ -f version.date ] || return 1
-        REV="$(cat version)"
-        SOURCE_DATE_EPOCH="$(cat version.date)"
+	[ -f version ] && [ -f version.date ] || return 1
+	REV="$(cat version)"
+	SOURCE_DATE_EPOCH="$(cat version.date)"
 
-        [ -n "$REV" ] && [ -n "$SOURCE_DATE_EPOCH" ]
+	[ -n "$REV" ] && [ -n "$SOURCE_DATE_EPOCH" ]
 }
 
 try_git() {
@@ -48,7 +48,7 @@ try_git() {
 	REV="$(git describe --tags --always --dirty 2>/dev/null)"
 	SOURCE_DATE_EPOCH="$(git log -1 --format=format:%ct)"
 
-        [ -n "$REV" ] && [ -n "$SOURCE_DATE_EPOCH" ]
+	[ -n "$REV" ] && [ -n "$SOURCE_DATE_EPOCH" ]
 }
 
 output_version() {
