@@ -311,7 +311,7 @@ version.h: version
 version:
 	./version.sh
 
-unsquashfs: version $(UNSQUASHFS_OBJS)
+unappimage: version $(UNSQUASHFS_OBJS)
 	$(CC) $(LDFLAGS) $(EXTRA_LDFLAGS) $(UNSQUASHFS_OBJS) $(LIBS) -o $@
 
 unsquashfs.o: unsquashfs.h unsquashfs.c squashfs_fs.h squashfs_swap.h \
@@ -332,13 +332,12 @@ unsquashfs_info.o: unsquashfs.h squashfs_fs.h
 
 .PHONY: clean
 clean:
-	-rm -f *.o mksquashfs unsquashfs
+	-rm -f *.o unappimage
 
 .PHONY: install
 install: unappimage
 	mkdir -p $(INSTALL_DIR)
-	cp mksquashfs $(INSTALL_DIR)
-	cp unsquashfs $(INSTALL_DIR)
+	cp unappimage $(INSTALL_DIR)
 
 .PHONY: checkastyle
 checkastyle:

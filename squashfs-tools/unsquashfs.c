@@ -32,6 +32,9 @@
 #include "stdarg.h"
 #include "fnmatch_compat.h"
 
+#include <libelf.h>
+#include <gelf.h>
+
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/resource.h>
