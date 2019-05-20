@@ -24,25 +24,6 @@
  *
  */
 
-#ifndef linux
-#define __BYTE_ORDER BYTE_ORDER
-#define __BIG_ENDIAN BIG_ENDIAN
-#define __LITTLE_ENDIAN LITTLE_ENDIAN
-#else
-#include <endian.h>
-#endif
-
-#if __BYTE_ORDER == __BIG_ENDIAN
-extern unsigned int inswap_le32(unsigned int);
-
-#define SQUASHFS_INSWAP_COMP_OPTS(s) { \
-	(s)->dictionary_size = inswap_le32((s)->dictionary_size); \
-	(s)->flags = inswap_le32((s)->flags); \
-}
-#else
-#define SQUASHFS_INSWAP_COMP_OPTS(s)
-#endif
-
 #define MEMLIMIT (32 * 1024 * 1024)
 
 struct bcj {

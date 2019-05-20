@@ -44,7 +44,7 @@ extern void display_compressors(char *, char *);
 extern void display_compressor_usage(char *);
 
 static inline int compressor_init(struct compressor *comp, void **stream,
-	int block_size, int datablock)
+				  int block_size, int datablock)
 {
 	if(comp->init == NULL)
 		return 0;
@@ -53,14 +53,14 @@ static inline int compressor_init(struct compressor *comp, void **stream,
 
 
 static inline int compressor_compress(struct compressor *comp, void *strm,
-	void *dest, void *src, int size, int block_size, int *error)
+				      void *dest, void *src, int size, int block_size, int *error)
 {
 	return comp->compress(strm, dest, src, size, block_size, error);
 }
 
 
 static inline int compressor_uncompress(struct compressor *comp, void *dest,
-	void *src, int size, int block_size, int *error)
+					void *src, int size, int block_size, int *error)
 {
 	return comp->uncompress(dest, src, size, block_size, error);
 }
@@ -71,7 +71,7 @@ static inline int compressor_uncompress(struct compressor *comp, void *dest,
  * compressors for commented examples of how they are used.
  */
 static inline int compressor_options(struct compressor *comp, char *argv[],
-	int argc)
+				     int argc)
 {
 	if(comp->options == NULL)
 		return -1;
@@ -89,7 +89,7 @@ static inline int compressor_options_post(struct compressor *comp, int block_siz
 
 
 static inline void *compressor_dump_options(struct compressor *comp,
-	int block_size, int *size)
+		int block_size, int *size)
 {
 	if(comp->dump_options == NULL)
 		return NULL;
@@ -98,7 +98,7 @@ static inline void *compressor_dump_options(struct compressor *comp,
 
 
 static inline int compressor_extract_options(struct compressor *comp,
-	int block_size, void *buffer, int size)
+		int block_size, void *buffer, int size)
 {
 	if(comp->extract_options == NULL)
 		return size ? -1 : 0;
@@ -107,7 +107,7 @@ static inline int compressor_extract_options(struct compressor *comp,
 
 
 static inline int compressor_check_options(struct compressor *comp,
-	int block_size, void *buffer, int size)
+		int block_size, void *buffer, int size)
 {
 	if(comp->check_options == NULL)
 		return 0;
@@ -116,7 +116,7 @@ static inline int compressor_check_options(struct compressor *comp,
 
 
 static inline void compressor_display_options(struct compressor *comp,
-	void *buffer, int size)
+		void *buffer, int size)
 {
 	if(comp->display_options != NULL)
 		comp->display_options(buffer, size);

@@ -157,7 +157,6 @@ ifeq ($(LZMA_XZ_SUPPORT),1)
 CFLAGS += -DLZMA_SUPPORT
 MKSQUASHFS_OBJS += lzma_xz_wrapper.o
 UNSQUASHFS_OBJS += lzma_xz_wrapper.o
-LIBS += -llzma
 COMPRESSORS += lzma
 endif
 
@@ -165,8 +164,18 @@ ifeq ($(XZ_SUPPORT),1)
 CFLAGS += -DXZ_SUPPORT
 MKSQUASHFS_OBJS += xz_wrapper.o
 UNSQUASHFS_OBJS += xz_wrapper.o
-LIBS += -llzma
 COMPRESSORS += xz
+endif
+
+ifneq ($(LZMA_XZ_SUPPORT)$(XZ_SUPPORT),)
+MKSQUASHFS_OBJS += lzma_xz_options.o
+UNSQUASHFS_OBJS += lzma_xz_options.o
+ifneq ($(LZMA_LIB),)
+MKSQUASHFS_OBJS += $(LZMA_LIB)
+UNSQUASHFS_OBJS += $(LZMA_LIB)
+else
+LIBS += -llzma
+endif
 endif
 
 ifeq ($(LZO_SUPPORT),1)
@@ -247,9 +256,10 @@ all: unappimage
 mksquashfs: $(MKSQUASHFS_OBJS)
 	$(CC) $(LDFLAGS) $(EXTRA_LDFLAGS) $(MKSQUASHFS_OBJS) $(LIBS) -o $@
 
-mksquashfs.o: Makefile mksquashfs.c squashfs_fs.h squashfs_swap.h mksquashfs.h \
+mksquashfs.o: Makefile version mksquashfs.c squashfs_fs.h squashfs_swap.h mksquashfs.h \
 	sort.h pseudo.h compressor.h xattr.h action.h error.h progressbar.h \
-	info.h caches-queues-lists.h read_fs.h restore.h process_fragments.h
+	info.h caches-queues-lists.h read_fs.h restore.h process_fragments.h \
+	version.h
 
 read_fs.o: read_fs.c squashfs_fs.h squashfs_swap.h compressor.h xattr.h \
 	error.h mksquashfs.h
@@ -295,11 +305,17 @@ lz4_wrapper.o: lz4_wrapper.c squashfs_fs.h lz4_wrapper.h compressor.h
 
 xz_wrapper.o: xz_wrapper.c squashfs_fs.h xz_wrapper.h compressor.h
 
-unappimage: $(UNSQUASHFS_OBJS)
+# use target version to always call version.h
+.PHONY: version
+version.h: version
+version:
+	./version.sh
+
+unsquashfs: version $(UNSQUASHFS_OBJS)
 	$(CC) $(LDFLAGS) $(EXTRA_LDFLAGS) $(UNSQUASHFS_OBJS) $(LIBS) -o $@
 
 unsquashfs.o: unsquashfs.h unsquashfs.c squashfs_fs.h squashfs_swap.h \
-	squashfs_compat.h xattr.h read_fs.h compressor.h
+	squashfs_compat.h xattr.h read_fs.h compressor.h version.h
 
 unsquash-1.o: unsquashfs.h unsquash-1.c squashfs_fs.h squashfs_compat.h
 
@@ -321,4 +337,34 @@ clean:
 .PHONY: install
 install: unappimage
 	mkdir -p $(INSTALL_DIR)
-	cp unappimage $(INSTALL_DIR)
+	cp mksquashfs $(INSTALL_DIR)
+	cp unsquashfs $(INSTALL_DIR)
+
+.PHONY: checkastyle
+checkastyle:
+	@command -v astyle >/dev/null 2>&1 || \
+		{ echo >&2 "We need 'astyle' but it's not installed. Aborting."; exit 1; }
+
+.PHONY: checkstyle
+checkstyle: checkastyle
+	@if astyle \
+		--dry-run \
+		--lineend=linux \
+		--suffix=none \
+		--style=kr \
+		--indent=force-tab=8 \
+		--formatted --recursive "./*.c" "./*.h" | grep -q -i formatted ; then \
+		echo Please fix formatting or run fixstyle ; false ; else \
+		echo Style looks ok. ; fi
+
+.PHONY: fixstyle
+fixstyle: checkastyle
+	@echo "\033[1;34mChecking style ...\033[00m"
+	@if astyle \
+		--lineend=linux \
+		--suffix=none \
+		--style=kr \
+		--indent=force-tab=8 \
+		--formatted --recursive "./*.c" "./*.h" | grep -q -i formatted ; then \
+		echo "\033[1;33mPrevious files have been corrected\033[00m" ; else \
+		echo "\033[0;32mAll files are ok\033[00m" ; fi

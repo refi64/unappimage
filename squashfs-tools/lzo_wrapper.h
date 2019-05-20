@@ -24,7 +24,7 @@
  *
  */
 
-#ifndef linux
+#if !defined(linux) && !defined(__GLIBC__)
 #define __BYTE_ORDER BYTE_ORDER
 #define __BIG_ENDIAN BIG_ENDIAN
 #define __LITTLE_ENDIAN LITTLE_ENDIAN
@@ -62,7 +62,7 @@ struct lzo_algorithm {
 	char *name;
 	int size;
 	int (*compress) (const lzo_bytep, lzo_uint, lzo_bytep, lzo_uintp,
-		lzo_voidp);
+			 lzo_voidp);
 };
 
 struct lzo_stream {
@@ -73,6 +73,6 @@ struct lzo_stream {
 #define LZO_MAX_EXPANSION(size)	(size + (size / 16) + 64 + 3)
 
 int lzo1x_999_wrapper(const lzo_bytep, lzo_uint, lzo_bytep, lzo_uintp,
-		lzo_voidp);
+		      lzo_voidp);
 
 #endif

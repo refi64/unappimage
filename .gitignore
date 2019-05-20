@@ -1,2 +1,5 @@
 *.o
-unappimage
+*.sw[opq]
+squashfs-tools/mksquashfs
+squashfs-tools/unsquashfs
+squashfs-tools/version.h

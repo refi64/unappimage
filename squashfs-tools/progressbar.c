@@ -59,7 +59,7 @@ static void sigwinch_handler()
 	if(ioctl(1, TIOCGWINSZ, &winsize) == -1) {
 		if(isatty(STDOUT_FILENO))
 			ERROR("TIOCGWINSZ ioctl failed, defaulting to 80 "
-				"columns\n");
+			      "columns\n");
 		columns = 80;
 	} else
 		columns = winsize.ws_col;
@@ -167,7 +167,7 @@ void set_progressbar_state(int state)
 	if(display_progress_bar != state) {
 		if(display_progress_bar && !temp_disabled) {
 			progress_bar(cur_uncompressed, estimated_uncompressed,
-				columns);
+				     columns);
 			printf("\n");
 		}
 		display_progress_bar = state;
@@ -185,7 +185,7 @@ void *progress_thrd(void *arg)
 	if(ioctl(1, TIOCGWINSZ, &winsize) == -1) {
 		if(isatty(STDOUT_FILENO))
 			ERROR("TIOCGWINSZ ioctl failed, defaulting to 80 "
-				"columns\n");
+			      "columns\n");
 		columns = 80;
 	} else
 		columns = winsize.ws_col;
@@ -210,7 +210,7 @@ void *progress_thrd(void *arg)
 		pthread_mutex_lock(&progress_mutex);
 		if(display_progress_bar && !temp_disabled)
 			progress_bar(cur_uncompressed, estimated_uncompressed,
-				columns);
+				     columns);
 		pthread_mutex_unlock(&progress_mutex);
 	}
 }

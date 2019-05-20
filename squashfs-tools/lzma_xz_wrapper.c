@@ -27,6 +27,7 @@
 
 #include "squashfs_fs.h"
 #include "compressor.h"
+#include "lzma_xz_options.h"
 
 #define LZMA_PROPS_SIZE 5
 #define LZMA_UNCOMP_SIZE 8
@@ -36,15 +37,29 @@
 #define MEMLIMIT (32 * 1024 * 1024)
 
 static int lzma_compress(void *dummy, void *dest, void *src,  int size,
-	int block_size, int *error)
+			 int block_size, int *error)
 {
+	uint32_t preset;
 	unsigned char *d = (unsigned char *) dest;
+	struct lzma_xz_options *opts = lzma_xz_get_options();
+
 	lzma_options_lzma opt;
 	lzma_stream strm = LZMA_STREAM_INIT;
 	int res;
 
-	lzma_lzma_preset(&opt, LZMA_OPTIONS);
-	opt.dict_size = block_size;
+	preset = opts->preset;
+
+	if (opts->extreme)
+		preset |= LZMA_PRESET_EXTREME;
+
+	lzma_lzma_preset(&opt, opts->preset);
+	opt.lc = opts->lc;
+	opt.lp = opts->lp;
+	opt.pb = opts->pb;
+	if (opts->fb)
+		opt.nice_len = opts->fb;
+
+	opt.dict_size = opts->dict_size;
 
 	res = lzma_alone_encoder(&strm, &opt);
 	if(res != LZMA_OK) {
@@ -62,11 +77,11 @@ static int lzma_compress(void *dummy, void *dest, void *src,  int size,
 
 	if(res == LZMA_STREAM_END) {
 		/*
-	 	 * Fill in the 8 byte little endian uncompressed size field in
+		 * Fill in the 8 byte little endian uncompressed size field in
 		 * the LZMA header.  8 bytes is excessively large for squashfs
 		 * but this is the standard LZMA header and which is expected by
 		 * the kernel code
-	 	 */
+		 */
 
 		d[LZMA_PROPS_SIZE] = size & 255;
 		d[LZMA_PROPS_SIZE + 1] = (size >> 8) & 255;
@@ -82,8 +97,8 @@ static int lzma_compress(void *dummy, void *dest, void *src,  int size,
 
 	if(res == LZMA_OK)
 		/*
-	 	 * Output buffer overflow.  Return out of buffer space
-	 	 */
+		 * Output buffer overflow.  Return out of buffer space
+		 */
 		return 0;
 
 failed:
@@ -97,7 +112,7 @@ failed:
 
 
 static int lzma_uncompress(void *dest, void *src, int size, int outsize,
-	int *error)
+			   int *error)
 {
 	lzma_stream strm = LZMA_STREAM_INIT;
 	int uncompressed_size = 0, res;
@@ -111,9 +126,9 @@ static int lzma_uncompress(void *dest, void *src, int size, int outsize,
 
 	memcpy(lzma_header, src, LZMA_HEADER_SIZE);
 	uncompressed_size = lzma_header[LZMA_PROPS_SIZE] |
-		(lzma_header[LZMA_PROPS_SIZE + 1] << 8) |
-		(lzma_header[LZMA_PROPS_SIZE + 2] << 16) |
-		(lzma_header[LZMA_PROPS_SIZE + 3] << 24);
+			    (lzma_header[LZMA_PROPS_SIZE + 1] << 8) |
+			    (lzma_header[LZMA_PROPS_SIZE + 2] << 16) |
+			    (lzma_header[LZMA_PROPS_SIZE + 3] << 24);
 
 	if(uncompressed_size > outsize) {
 		res = 0;
@@ -141,7 +156,7 @@ static int lzma_uncompress(void *dest, void *src, int size, int outsize,
 	lzma_end(&strm);
 
 	if(res == LZMA_STREAM_END || (res == LZMA_OK &&
-		strm.total_out >= uncompressed_size && strm.avail_in == 0))
+				      strm.total_out >= uncompressed_size && strm.avail_in == 0))
 		return uncompressed_size;
 
 failed:
@@ -149,13 +164,45 @@ failed:
 	return -1;
 }
 
+static int lzma_options(char *argv[], int argc)
+{
+	return lzma_xz_options(argv, argc, LZMA_OPT_LZMA);
+}
+
+
+static int lzma_options_post(int block_size)
+{
+	return lzma_xz_options_post(block_size, LZMA_OPT_LZMA);
+}
+
+
+static void *lzma_dump_options(int block_size, int *size)
+{
+	return lzma_xz_dump_options(block_size, size, 0);
+}
+
+
+static int lzma_extract_options(int block_size, void *buffer, int size)
+{
+	return lzma_xz_extract_options(block_size, buffer, size, LZMA_OPT_LZMA);
+}
+
+
+void lzma_usage()
+{
+	lzma_xz_usage(LZMA_OPT_LZMA);
+}
+
 
 struct compressor lzma_comp_ops = {
 	.init = NULL,
 	.compress = lzma_compress,
 	.uncompress = lzma_uncompress,
-	.options = NULL,
-	.usage = NULL,
+	.options = lzma_options,
+	.options_post = lzma_options_post,
+	.dump_options = lzma_dump_options,
+	.extract_options = lzma_extract_options,
+	.usage = lzma_usage,
 	.id = LZMA_COMPRESSION,
 	.name = "lzma",
 	.supported = 1

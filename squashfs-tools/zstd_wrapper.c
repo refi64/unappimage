@@ -57,7 +57,7 @@ static int zstd_options(char *argv[], int argc)
 
 		compression_level = atoi(argv[1]);
 		if (compression_level < 1 ||
-		    compression_level > ZSTD_maxCLevel()) {
+				compression_level > ZSTD_maxCLevel()) {
 			fprintf(stderr, "zstd: -Xcompression-level invalid, it "
 				"should be 1 <= n <= %d\n", ZSTD_maxCLevel());
 			goto failed;
@@ -133,7 +133,7 @@ static int zstd_extract_options(int block_size, void *buffer, int size)
 	SQUASHFS_INSWAP_COMP_OPTS(comp_opts);
 
 	if (comp_opts->compression_level < 1 ||
-	    comp_opts->compression_level > ZSTD_maxCLevel()) {
+			comp_opts->compression_level > ZSTD_maxCLevel()) {
 		fprintf(stderr, "zstd: bad compression level in compression "
 			"options structure\n");
 		goto failed;
@@ -161,7 +161,7 @@ static void zstd_display_options(void *buffer, int size)
 	SQUASHFS_INSWAP_COMP_OPTS(comp_opts);
 
 	if (comp_opts->compression_level < 1 ||
-	    comp_opts->compression_level > ZSTD_maxCLevel()) {
+			comp_opts->compression_level > ZSTD_maxCLevel()) {
 		fprintf(stderr, "zstd: bad compression level in compression "
 			"options structure\n");
 		goto failed;

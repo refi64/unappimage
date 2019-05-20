@@ -100,7 +100,7 @@ struct squashfs_dev_inode_header_3 {
 	unsigned int		nlink;
 	unsigned short		rdev;
 } __attribute__ ((packed));
-	
+
 struct squashfs_symlink_inode_header_3 {
 	unsigned int		inode_type:4;
 	unsigned int		mode:12;
@@ -182,7 +182,7 @@ union squashfs_inode_header_3 {
 	struct squashfs_ldir_inode_header_3	ldir;
 	struct squashfs_ipc_inode_header_3	ipc;
 };
-	
+
 struct squashfs_dir_entry_3 {
 	unsigned int		offset:13;
 	unsigned int		type:3;
@@ -466,7 +466,7 @@ struct squashfs_dev_inode_header_1 {
 	unsigned int		guid:4; /* index into guid table */
 	unsigned short		rdev;
 } __attribute__ ((packed));
-	
+
 struct squashfs_symlink_inode_header_1 {
 	unsigned int		inode_type:4;
 	unsigned int		mode:12; /* protection */
@@ -599,7 +599,7 @@ struct squashfs_dev_inode_header_2 {
 	unsigned int		guid:8; /* index into guid table */
 	unsigned short		rdev;
 } __attribute__ ((packed));
-	
+
 struct squashfs_symlink_inode_header_2 {
 	unsigned int		inode_type:4;
 	unsigned int		mode:12; /* protection */
@@ -655,7 +655,7 @@ union squashfs_inode_header_2 {
 	struct squashfs_ldir_inode_header_2	ldir;
 	struct squashfs_ipc_inode_header_2	ipc;
 };
-	
+
 struct squashfs_dir_header_2 {
 	unsigned int		count:8;
 	unsigned int		start_block:24;
@@ -798,10 +798,10 @@ typedef struct squashfs_fragment_entry_2 squashfs_fragment_entry_2;
  * bitfields and different bitfield placing conventions on differing architectures
  */
 #if __BYTE_ORDER == __BIG_ENDIAN
-	/* convert from big endian to little endian */
+/* convert from big endian to little endian */
 #define SQUASHFS_SWAP(value, p, pos, tbits) _SQUASHFS_SWAP(value, p, pos, tbits, b_pos)
 #else
-	/* convert from little endian to big endian */ 
+/* convert from little endian to big endian */
 #define SQUASHFS_SWAP(value, p, pos, tbits) _SQUASHFS_SWAP(value, p, pos, tbits, 64 - tbits - b_pos)
 #endif
 

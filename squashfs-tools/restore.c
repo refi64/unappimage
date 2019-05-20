@@ -47,8 +47,8 @@
 #define TRUE 1
 
 extern pthread_t reader_thread, writer_thread, main_thread;
-extern pthread_t *deflator_thread, *frag_deflator_thread, *frag_thread;
-extern struct queue *to_deflate, *to_writer, *to_frag, *to_process_frag;
+extern pthread_t *deflator_thread, *frag_thread;
+extern struct queue *to_deflate, *to_writer, *to_process_frag;
 extern struct seq_queue *to_main;
 extern void restorefs();
 extern int processors;
@@ -72,8 +72,8 @@ void *restore_thrd(void *arg)
 
 		if((sig == SIGINT || sig == SIGTERM) && !interrupted) {
 			ERROR("Interrupting will restore original "
-				"filesystem!\n");
-                	ERROR("Interrupt again to quit\n");
+			      "filesystem!\n");
+			ERROR("Interrupt again to quit\n");
 			interrupted = TRUE;
 			continue;
 		}
@@ -119,17 +119,6 @@ void *restore_thrd(void *arg)
 		/* now kill the main thread */
 		pthread_cancel(main_thread);
 		pthread_join(main_thread, NULL);
-
-		/* then flush the main thread to fragment deflator thread(s)
-		 * queue.  The fragment deflator thread(s) will idle
-		 */
-		queue_flush(to_frag);
-
-		/* now kill the fragment deflator thread(s) */
-		for(i = 0; i < processors; i++)
-			pthread_cancel(frag_deflator_thread[i]);
-		for(i = 0; i < processors; i++)
-			pthread_join(frag_deflator_thread[i], NULL);
 
 		/*
 		 * then flush the main thread/fragment deflator thread(s)
